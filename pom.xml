@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	
+	
+	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
+	<artifactId>bayeos-logger-fx</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0.7-SNAPSHOT</version>	
+	<description>Application to communicate with a BayEOS Logger over serial line.</description>
+	
+	<parent>
+		<groupId>de.unibayreuth.bayceer.bayeos</groupId>
+		<artifactId>bayeos-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../bayeos-parent/pom.xml</relativePath>
+	</parent>
+
+	
+	<properties>
+		<codebase>http://www.bayceer.uni-bayreuth.de/edv/bayeos</codebase>
+		<publish.path>${publish.webstart.path}</publish.path>
+		<jnlpTitle>BayEOS Logger ${project.version}</jnlpTitle>		
+	</properties>
+			
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/deploy</directory>
+				<filtering>true</filtering>			
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<!-- Run stand alone -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<executable>java</executable>
+					<arguments>
+						<argument>-classpath</argument>
+						<classpath />
+						<argument>bayeos.logger.MainApp</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<!-- Create jnlp version 
+				http://mojo.codehaus.org/webstart/webstart-maven-plugin/jnlp-mojos-overview.html 
+				-->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<version>1.0-beta-6</version>
+				
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jnlp-inline</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<codebase>${codebase}/${project.name}-${project.version}</codebase>
+					<updateManifestEntries>
+						<Permissions>all-permissions</Permissions>
+						<Codebase>${codebase}</Codebase>
+					</updateManifestEntries>
+					<libPath>lib</libPath>
+					<jnlp>
+						<mainClass>bayeos.logger.MainApp</mainClass>
+						<outputFile>start.jnlp</outputFile>
+					</jnlp>
+					<sign>
+						<keystore>${keystore.path}</keystore>
+						<keypass>${keystore.key.password}</keypass>
+						<storepass>${keystore.store.password}</storepass>
+						<alias>${keystore.alias}</alias>
+					</sign>
+					<verbose>false</verbose>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<!-- Create jar version 
+				http://zenjava.com/javafx/maven/
+				-->			
+				<groupId>com.zenjava</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>2.0</version>
+				<executions>
+					<execution>	
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<mainClass>bayeos.logger.MainApp</mainClass>
+						</configuration>
+					</execution>	
+				</executions>
+			</plugin>
+			<!-- Deploy on File Server -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>						
+						<phase>deploy</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo message="Copy jnlp to ${publish.path}" />
+								<copy todir="${publish.path}/${project.name}-${project.version}">
+									<fileset dir="target/jnlp"/>
+								</copy>
+								<echo message="Pack jfx to ${publish.path}" />								
+								<zip destfile="${publish.path}/${project.name}-${project.version}.zip" basedir="target/jfx/app"/>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			     
+	  
+  
+	  
+	  
+	  
+    </plugins>
+	</build>
+
+	<dependencies>		
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>javafx</artifactId>
+			<version>2.2</version>
+			<systemPath>${java.home}/lib/jfxrt.jar</systemPath>
+			<scope>system</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.neuronrobotics</groupId>
+			<artifactId>nrjavaserial</artifactId>
+			<version>3.7.5.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
+			<artifactId>bayeos-logger-api</artifactId>
+			<version>1.0.0</version>
+		</dependency> 
+		
+		<dependency>
+			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
+			<artifactId>bayeos-password-file</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.8.3.0</version>
+		</dependency>
+
+		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.1</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.httpcomponents</groupId>
+  			<artifactId>fluent-hc</artifactId>
+  			<version>4.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.9</version>
+		</dependency>
+	</dependencies>
+	
+		
+	
+	
+</project>

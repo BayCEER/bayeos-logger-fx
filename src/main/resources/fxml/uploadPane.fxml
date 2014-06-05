@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<BorderPane id="BorderPane" minHeight="119.0" prefHeight="179.0" prefWidth="325.0" xmlns:fx="http://javafx.com/fxml" fx:controller="bayeos.logger.dump.UploadBoardController">
+  <bottom>
+    <HBox alignment="CENTER_RIGHT" fillHeight="false" prefHeight="50.0" spacing="10.0">
+      <children>
+        <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#cancelPressed" prefHeight="20.0" prefWidth="100.0" text="Cancel" />
+        <Button fx:id="btnOk" defaultButton="true" mnemonicParsing="false" onAction="#okPressed" prefHeight="20.0" prefWidth="100.0" text="Ok" />
+      </children>
+      <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+    </HBox>
+  </bottom>
+  <top>
+    <VBox minHeight="81.0" prefHeight="81.0" spacing="10.0">
+      <children>
+        <AnchorPane prefHeight="71.0" prefWidth="305.0">
+          <children>
+            <ChoiceBox fx:id="choCon" layoutY="9.0" prefHeight="22.0" prefWidth="181.0" AnchorPane.leftAnchor="124.0" AnchorPane.rightAnchor="0.0" />
+            <Label layoutY="12.0" text="BayEOS Connection:" AnchorPane.leftAnchor="5.0" />
+          </children>
+        </AnchorPane>
+        <AnchorPane prefHeight="71.0" prefWidth="305.0">
+          <children>
+            <HBox prefHeight="21.0" prefWidth="181.0" AnchorPane.leftAnchor="124.0" AnchorPane.rightAnchor="0.0">
+              <children>
+                <TextField fx:id="txtStart" editable="false" prefWidth="181.0" />
+                <SimpleCalendar fx:id="calStart" />
+              </children>
+            </HBox>
+            <Label fx:id="lblStart" layoutY="6.0" text="Start:" AnchorPane.leftAnchor="5.0" />
+          </children>
+        </AnchorPane>
+        <AnchorPane prefHeight="71.0" prefWidth="305.0">
+          <children>
+            <HBox prefHeight="21.0" prefWidth="181.0" AnchorPane.leftAnchor="124.0" AnchorPane.rightAnchor="0.0">
+              <children>
+                <TextField fx:id="txtEnd" editable="false" prefWidth="181.0" />
+                <SimpleCalendar fx:id="calEnd" />
+              </children>
+            </HBox>
+            <Label fx:id="lblEnd" layoutY="6.0" text="End:" AnchorPane.leftAnchor="5.0" />
+          </children>
+        </AnchorPane>
+      </children>
+      <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+    </VBox>
+  </top>
+</BorderPane>

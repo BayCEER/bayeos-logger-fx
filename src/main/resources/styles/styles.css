@@ -1,0 +1,30 @@
+/* Application wide styles */
+
+
+.connect-image {
+    -fx-image: url("../images/connect.png");
+}
+
+.disconnect-image {
+    -fx-image: url("../images/disconnect.png");
+}
+
+.download-image {
+    -fx-image: url("../images/download.png");
+}
+
+.upload-image {
+    -fx-image: url("../images/upload.png");
+}
+
+.cross-image {
+    -fx-image: url("../images/cross.png");
+}
+
+.dump-file-image {
+    -fx-image: url("../images/dump_file.png");
+}
+
+
+
+

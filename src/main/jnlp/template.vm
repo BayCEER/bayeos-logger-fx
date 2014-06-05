@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="$encoding"?>
+<jnlp
+    spec="$jnlpspec"
+    codebase="${codebase}/$project.ArtifactId"
+    href="$outputFile">
+ <information>
+  <title>$jnlpTitle</title>
+  <vendor>$project.Organization.Name</vendor>
+  <description>$project.Description</description>
+  <icon href="images/icon.png"/>
+  <offline-allowed/>
+  <shortcut>
+   <desktop/>
+  </shortcut>
+ </information>
+ <security>
+     <all-permissions/>
+ </security>
+ <resources>
+   <j2se version="1.7+" />     
+   <jfx:javafx-runtime version="2.2+" />   
+     $dependencies     
+ </resources>
+ <application-desc main-class="$mainClass">    
+ </application-desc> 
+</jnlp>

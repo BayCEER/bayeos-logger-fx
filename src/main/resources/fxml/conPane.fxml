@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefHeight="219.0" prefWidth="400.0" xmlns:fx="http://javafx.com/fxml"  fx:controller="bayeos.logger.pref.ConController">
+  <bottom>
+    <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="500.0" spacing="10.0" BorderPane.alignment="CENTER_RIGHT">
+      <children>
+        <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#okAction" text="Ok" />
+        <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#cancelAction" text="Cancel" />
+      </children>
+      <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+    </HBox>
+  </bottom>
+  <center>
+    <AnchorPane prefHeight="169.0" prefWidth="325.0">
+      <children>
+        <Label fx:id="lblName" layoutX="14.0" layoutY="27.0" text="Name:" />
+        <TextField fx:id="txtName" layoutY="24.0" prefWidth="254.0" AnchorPane.leftAnchor="74.0" AnchorPane.rightAnchor="10.0" />
+        <Label fx:id="lblHost" layoutX="14.0" layoutY="66.0" text="Host:" />
+        <TextField fx:id="txtHost" layoutY="63.0" prefWidth="254.0" AnchorPane.leftAnchor="74.0" AnchorPane.rightAnchor="10.0" />
+        <Label fx:id="lblUser" layoutX="15.0" layoutY="104.0" text="User:" />
+        <TextField fx:id="txtUser" layoutY="100.0" prefWidth="254.0" AnchorPane.leftAnchor="74.0" AnchorPane.rightAnchor="10.0" />
+        <Label fx:id="lblPassword" layoutX="14.0" layoutY="139.0" text="Password:" />
+        <PasswordField fx:id="txtPasswd" layoutY="136.0" prefWidth="254.0" AnchorPane.leftAnchor="74.0" AnchorPane.rightAnchor="10.0" />
+      </children>
+    </AnchorPane>
+  </center>
+</BorderPane>
