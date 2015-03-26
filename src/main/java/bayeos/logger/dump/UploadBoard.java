@@ -14,7 +14,6 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import bayeos.logger.MainApp;
-import de.unibayreuth.bayeos.connection.Connection;
 import de.unibayreuth.bayeos.connection.ConnectionFactory;
 
 public class UploadBoard {
