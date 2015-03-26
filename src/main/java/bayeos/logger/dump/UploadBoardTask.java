@@ -11,10 +11,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import bayeos.logger.TaskController;
-import binary.IntArray;
 import de.unibayreuth.bayeos.connection.Connection;
 import frame.parser.DataReader;
-import frame.service.Frame;
 
 
 
@@ -62,7 +60,7 @@ public class UploadBoardTask extends Task<Boolean> {
 			for(int i=0;i<frames.size();i++) {
 				
 				DataReader reader = new DataReader();
-				Map<String, Object> ret = reader.read(Base64.decodeBase64(frames.get(i)), board.getName(), null);
+				Map<String, Object> ret = reader.read(Base64.decodeBase64(frames.get(i)), board.getName(), new Date());
 				Date t = (Date) ret.get("result_time");
 												
 				if (!(t.before(startDate)) || t.after(endDate)) {
