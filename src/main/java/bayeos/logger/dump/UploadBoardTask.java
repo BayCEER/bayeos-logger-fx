@@ -23,7 +23,7 @@ public class UploadBoardTask extends Task<Boolean> {
 	private Connection con;
 	private Date startDate;
 	private Date endDate;
-	private final static int FRAMES_PER_POST = 10000;
+	private final static int FRAMES_PER_POST = 5000;
 	private static final Logger log = Logger.getLogger(UploadBoardTask.class);
 	
 	public UploadBoardTask(Board b, Map<String, Object> ret) {
@@ -50,7 +50,7 @@ public class UploadBoardTask extends Task<Boolean> {
 		List<String> frames;
 		
 		int post = 0;
-		while ((frames = DAO.getFrameDAO().getFrames(board.getId(), offset, FRAMES_PER_POST)).size() > 0) {
+		while ((frames = DAO.getFrameDAO().getFrames(board.getId(), offset, FRAMES_PER_POST)).size() > 0) {			
 			if (isCancelled()) {				
 				updateMessage("Cancelled");	
 				return false;
@@ -61,17 +61,17 @@ public class UploadBoardTask extends Task<Boolean> {
 				
 				DataReader reader = new DataReader();
 				Map<String, Object> ret = reader.read(Base64.decodeBase64(frames.get(i)), board.getName(), new Date());
-				Date t = (Date) ret.get("result_time");
-												
-				if (!(t.before(startDate)) || t.after(endDate)) {
-					expFrames.add(frames.get(i));					
+				Date t = (Date) ret.get("result_time");				
+				if (t!=null){											
+					if (!(t.before(startDate)) || t.after(endDate)) {
+						expFrames.add(frames.get(i));					
+				    }
 				}
-										
-				
 			}
 			
 			ReturnCode ret = ReturnCode.OK;
 			if (expFrames.size()>0) {
+				
 				ret = client.postFrames(expFrames,board.getName());				
 			}			
 			if (ret.getResponseCode() == ReturnCode.OK.getResponseCode()) {					
