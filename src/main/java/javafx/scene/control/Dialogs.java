@@ -79,7 +79,6 @@ import javafx.stage.Window;
 
 import org.apache.log4j.Logger;
 
-import com.sun.javafx.css.StyleManager;
 
 public class Dialogs {
 	
@@ -992,7 +991,7 @@ public class Dialogs {
      */
     private static class FXDialog extends Stage {
         private BorderPane root;
-        private RootPane decoratedRoot;
+        private StackPane decoratedRoot;
         private HBox windowBtns;
         private Button minButton;
         private Button maxButton;
@@ -1049,7 +1048,7 @@ public class Dialogs {
 
             // *** The rest is for adding window decorations ***
 
-            decoratedRoot = new RootPane() {
+            decoratedRoot = new StackPane() {
                 @Override protected void layoutChildren() {
                     super.layoutChildren();
                     if (resizeCorner != null) {
@@ -1067,11 +1066,11 @@ public class Dialogs {
 
             decoratedRoot.getStyleClass().addAll("dialog", "decorated-root");
 
-            focusedProperty().addListener(new InvalidationListener() {
-                @Override public void invalidated(Observable valueModel) {
-                    decoratedRoot.pseudoClassStateChanged("active");
-                }
-            });
+//            focusedProperty().addListener(new InvalidationListener() {
+//                @Override public void invalidated(Observable valueModel) {
+//                    decoratedRoot.pseudoClassStateChanged("active");
+//                }
+//            });
 
             ToolBar toolBar = new ToolBar();
             toolBar.getStyleClass().add("window-header");
@@ -1214,30 +1213,28 @@ public class Dialogs {
         
 
         
-        private static class RootPane extends StackPane {
-            /*******************************************************************
-             *                                                                 *
-             * Stylesheet Handling                                             *
-             *                                                                 *
-             *******************************************************************/
-
-        	// !CHANGE START!
-            private static final long PSEUDO_CLASS_ACTIVE_MASK = 
-                    StyleManager.getInstance().getPseudoclassMask("active");
-            // !CHANGE END!
-
-            @Override public long impl_getPseudoClassState() {
-                long mask = super.impl_getPseudoClassState();
-                if (getScene().getWindow().isFocused()) {
-                    mask |= PSEUDO_CLASS_ACTIVE_MASK;
-                }
-                return mask;
-            }
-
-            private void pseudoClassStateChanged(String pseudoClass) {
-                impl_pseudoClassStateChanged(pseudoClass);
-            }
-        }
+//        private static class RootPane extends StackPane {
+//            /*******************************************************************
+//             *                                                                 *
+//             * Stylesheet Handling                                             *
+//             *                                                                 *
+//             *******************************************************************/
+//
+//        	// !CHANGE START!
+//            private static final long PSEUDO_CLASS_ACTIVE_MASK = 8589934592L;
+//
+//            @Override public long impl_getPseudoClassState() {
+//                long mask = super.impl_getPseudoClassState();
+//                if (getScene().getWindow().isFocused()) {
+//                    mask |= PSEUDO_CLASS_ACTIVE_MASK;
+//                }
+//                return mask;
+//            }
+//
+//            private void pseudoClassStateChanged(String pseudoClass) {
+//                impl_pseudoClassStateChanged(pseudoClass);
+//            }
+//        }
     }
     
     private static class ExceptionDialog extends FXDialog {

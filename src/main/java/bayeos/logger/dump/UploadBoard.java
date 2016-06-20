@@ -29,7 +29,6 @@ public class UploadBoard {
 		stage.initOwner(parentStage);			
 		stage.getIcons().add(new Image("/images/package_green.png"));
 		Scene scene = new Scene(page);
-		scene.getStylesheets().add(getClass().getResource("/styles/simplecalendar.css").toExternalForm());
 		stage.setScene(scene);		
 		UploadBoardController ctrl = loader.getController();
 		
@@ -58,15 +57,13 @@ public class UploadBoard {
 			ctrl.setSelectedConnection(defName);
 		}
 				
-		ctrl.setInterval(board.Start, board.End);
+		
 		
 		ctrl.setStage(stage);
 		stage.showAndWait();		
 		if (ctrl.isOkPressed()){
 			Map<String,Object> ret = new HashMap<String, Object>(3);
-			ret.put("con",ctrl.getConnection());
-			ret.put("startDate", ctrl.getStartDate());
-			ret.put("endDate", ctrl.getEndDate());
+			ret.put("con",ctrl.getConnection());			
 			return ret;
 		} else {
 			return null;

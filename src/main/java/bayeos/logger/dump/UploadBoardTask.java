@@ -21,17 +21,13 @@ public class UploadBoardTask extends Task<Boolean> {
 	private long posts = 0;
 	private Board board;
 	private Connection con;
-	private Date startDate;
-	private Date endDate;
-	private final static int FRAMES_PER_POST = 5000;
+	
+	private final static int FRAMES_PER_POST = 10000;
 	private static final Logger log = Logger.getLogger(UploadBoardTask.class);
 	
 	public UploadBoardTask(Board b, Map<String, Object> ret) {
 		this.board = b;
-		this.con = (Connection) ret.get("con");	
-		this.startDate = (Date) ret.get("startDate");
-		this.endDate = (Date) ret.get("endDate");
-		
+		this.con = (Connection) ret.get("con");			
 		posts = (long) Math.ceil(b.getRecords() / FRAMES_PER_POST) + 1;		
 	}
 	
@@ -56,22 +52,19 @@ public class UploadBoardTask extends Task<Boolean> {
 				return false;
 			}
 		
-			List<String> expFrames = new ArrayList<String>(FRAMES_PER_POST);
+			List<String> expFrames = new ArrayList<String>(frames.size());
 			for(int i=0;i<frames.size();i++) {
 				
 				DataReader reader = new DataReader();
 				Map<String, Object> ret = reader.read(Base64.decodeBase64(frames.get(i)), board.getName(), new Date());
 				Date t = (Date) ret.get("result_time");				
-				if (t!=null){											
-					if (!(t.before(startDate)) || t.after(endDate)) {
-						expFrames.add(frames.get(i));					
-				    }
+				if (t!=null){																
+						expFrames.add(frames.get(i));									    
 				}
 			}
 			
 			ReturnCode ret = ReturnCode.OK;
-			if (expFrames.size()>0) {
-				
+			if (expFrames.size()>0) {				
 				ret = client.postFrames(expFrames,board.getName());				
 			}			
 			if (ret.getResponseCode() == ReturnCode.OK.getResponseCode()) {					

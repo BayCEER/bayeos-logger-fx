@@ -1,24 +1,17 @@
 package bayeos.logger.dump;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import org.apache.log4j.Logger;
+
+import de.unibayreuth.bayeos.connection.Connection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.SimpleCalendar;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
-import org.apache.log4j.Logger;
-
-import de.unibayreuth.bayeos.connection.Connection;
 
 public class UploadBoardController {
 	
@@ -31,18 +24,8 @@ public class UploadBoardController {
 	
 	@FXML private ChoiceBox<String> choCon;
 	
-	@FXML 
-	private SimpleCalendar calStart;
 	
-	@FXML 
-	private SimpleCalendar calEnd;
-	
-	@FXML
-	private TextField txtStart;
-	
-	@FXML
-	private TextField txtEnd;		
-	
+		
 	
 	boolean okPressed = false;
 	
@@ -98,43 +81,12 @@ public class UploadBoardController {
 			choCon.getSelectionModel().select(0);
 	}
 	
-	public void setInterval(Date startDate, Date endDate) {
-		calStart.dateProperty().set(startDate);
-		calEnd.dateProperty().set(endDate);
-	}
+	
 	
 	@FXML
 	private void initialize() {
-		log.debug("Initialize UploadController");
-		
-		calEnd.dateProperty().addListener(new ChangeListener<Date>() {
-			@Override
-			public void changed(ObservableValue<? extends Date> ov,
-					Date oldDate, Date newDate) {
-				txtEnd.setText((new SimpleDateFormat()).format(newDate));
-				
-								
-			}
-		});
-		
-		calStart.dateProperty().addListener(new ChangeListener<Date>() {
-			@Override
-			public void changed(ObservableValue<? extends Date> ov,
-					Date oldDate, Date newDate) {
-				txtStart.setText((new SimpleDateFormat()).format(newDate));	
-				
-								
-			}
-		});
-				
+		log.debug("Initialize UploadController");							
 	}
 
-	public Object getStartDate() {
-		return calStart.dateProperty().getValue();
-	}
-
-	public Object getEndDate() {
-		return calEnd.dateProperty().getValue();
-	}
 
 }

@@ -82,13 +82,16 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import serial.SerialConnection;
+import bayeos.file.CSVFile;
+import bayeos.file.ExcelFile;
+import bayeos.file.SeriesFile;
 import bayeos.logger.dump.Board;
 import bayeos.logger.dump.DAO;
 import bayeos.logger.dump.DataModeChooser;
 import bayeos.logger.dump.DownloadBulkTask;
 import bayeos.logger.dump.DownloadFileTask;
 import bayeos.logger.dump.DownloadFrameTask;
-import bayeos.logger.dump.ExportExcelTask;
+import bayeos.logger.dump.ExportFileTask;
 import bayeos.logger.dump.UploadBoard;
 import bayeos.logger.dump.UploadBoardTask;
 import bayeos.logger.pref.PrefController;
@@ -195,6 +198,7 @@ public class MainController {
 	
 	private ExtensionFilter filterBayEOS = new FileChooser.ExtensionFilter("BayEOS Logger files (*.db)", "*.db");
 	private ExtensionFilter filterExcel = new FileChooser.ExtensionFilter("Excel Workbook (*.xslx)", "*.xslx");
+	private ExtensionFilter filterCSV = new FileChooser.ExtensionFilter("CSV  File (*.csv)", "*.csv");
 	
 	private DataModeChooser dataModeChooser;	
 	private TaskDialog taskDialog;
@@ -1006,21 +1010,37 @@ public class MainController {
 		log.debug("Export File Action started");
 		Board b = boardTable.getSelectionModel().getSelectedItem();		
 		fileChooser.getExtensionFilters().clear();
-		fileChooser.getExtensionFilters().add(filterExcel);	
+		fileChooser.getExtensionFilters().add(filterExcel);
+		fileChooser.getExtensionFilters().add(filterCSV);
 		// fileChooser.setInitialFileName(); since java 1.7.0.45
 		
-		File file = fileChooser.showSaveDialog(parentStage);
+		File file = fileChooser.showSaveDialog(parentStage);		
 		
+		
+		String path;
+		SeriesFile sFile;
 		
 		if (file != null) {
-			if (!file.getName().toLowerCase().endsWith(".xlsx")){
-				file = new File(file.getAbsolutePath() + ".xlsx");  
+			if (file.getName().toLowerCase().endsWith(".xlsx")){
+				sFile = new ExcelFile();
+			} else if (file.getName().toLowerCase().endsWith(".csv")){
+				sFile = new CSVFile();
+			} else {
+				Dialogs.showErrorDialog(parentStage, "Please insert a filename with extension.");
+				return;
 			}
-			try {
-				taskDialog.showDialog(parentStage, new ExportExcelTask(DAO.getConnection(),b,file));
+				
+			try {				
+				if (!sFile.open(file.getAbsolutePath())){
+					Dialogs.showErrorDialog(parentStage, "Failed to open file.");
+					return;
+				}				
+				taskDialog.showDialog(parentStage, new ExportFileTask(DAO.getConnection(),b,sFile));
 			} catch (IOException | SQLException e) {
 				Dialogs.showErrorDialog(parentStage, "Failed to export data to " + file.getAbsolutePath());
-			}								
+			} finally {
+				sFile.close();
+			}
 		}     
 	}
 
