@@ -28,9 +28,9 @@
               <center>
                 <GridPane fx:id="frmLogger" alignment="TOP_CENTER" hgap="10.0" vgap="10.0" BorderPane.alignment="TOP_CENTER">
                   <children>
-                    <TextField id="txtName" fx:id="txtLoggerVersion" editable="false" focusTraversable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    <TextField fx:id="txtLoggerName" editable="false" focusTraversable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                    <TextField fx:id="txtLoggerSampleInterval" editable="false" focusTraversable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  	<Label id="txtName" fx:id="txtLoggerVersion" GridPane.columnIndex="1" GridPane.rowIndex="0" />                  	                    
+                    <Label fx:id="txtLoggerName"  GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <Label fx:id="txtLoggerSampleInterval" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                     <Label GridPane.columnIndex="0" GridPane.rowIndex="5" />
                     <Label text="Estimated New Frames:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
                     <Label text="Name *:" GridPane.columnIndex="0" GridPane.rowIndex="1">
@@ -46,9 +46,9 @@
                       </textFill>
                     </Label>
                     <Label font="$x1" text="Current Date *:" textFill="$x2" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                    <TextField fx:id="txtLoggerCurrentDate" editable="false" focusTraversable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                    <TextField fx:id="txtLoggerNextFrame" editable="false" focusTraversable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                    <TextField fx:id="txtLoggerNewFrameCount" editable="false" focusTraversable="false" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                    <Label fx:id="txtLoggerCurrentDate" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    <Label fx:id="txtLoggerNextFrame"  GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                    <Label fx:id="txtLoggerNewFrameCount" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                     <Button fx:id="btnSetName" mnemonicParsing="false" onAction="#setNameAction" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                     <Button fx:id="btnSetSamplingInterval" mnemonicParsing="false" onAction="#setSamplingIntervalAction" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                     <Button fx:id="btnSetDate" mnemonicParsing="false" onAction="#setCurrentDateAction" text="Sync" GridPane.columnIndex="2" GridPane.rowIndex="3" />
