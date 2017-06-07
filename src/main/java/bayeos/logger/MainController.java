@@ -143,17 +143,17 @@ public class MainController {
 	@FXML
 	private GridPane frmLogger;
 	@FXML
-	private TextField txtLoggerVersion;
+	private Label txtLoggerVersion;
 	@FXML
-	private TextField txtLoggerName;
+	private Label txtLoggerName;
 	@FXML
-	private TextField txtLoggerSampleInterval;
+	private Label txtLoggerSampleInterval;
 	@FXML
-	private TextField txtLoggerCurrentDate;
+	private Label txtLoggerCurrentDate;
 	@FXML
-	private TextField txtLoggerNextFrame;
+	private Label txtLoggerNextFrame;
 	@FXML
-	private TextField txtLoggerNewFrameCount;
+	private Label txtLoggerNewFrameCount;
 	@FXML
 	private TableView<Board> boardTable;
 
@@ -197,7 +197,7 @@ public class MainController {
 	private FileChooser fileChooser;
 	
 	private ExtensionFilter filterBayEOS = new FileChooser.ExtensionFilter("BayEOS Logger files (*.db)", "*.db");
-	private ExtensionFilter filterExcel = new FileChooser.ExtensionFilter("Excel Workbook (*.xslx)", "*.xslx");
+	private ExtensionFilter filterExcel = new FileChooser.ExtensionFilter("Excel Workbook (*.xlsx)", "*.xlsx");
 	private ExtensionFilter filterCSV = new FileChooser.ExtensionFilter("CSV  File (*.csv)", "*.csv");
 	
 	private DataModeChooser dataModeChooser;	
@@ -1012,7 +1012,12 @@ public class MainController {
 		fileChooser.getExtensionFilters().clear();
 		fileChooser.getExtensionFilters().add(filterExcel);
 		fileChooser.getExtensionFilters().add(filterCSV);
+
 		// fileChooser.setInitialFileName(); since java 1.7.0.45
+		fileChooser.setInitialFileName(b.getName() + ".xlsx");
+		fileChooser.setSelectedExtensionFilter(filterExcel);
+		
+
 		
 		File file = fileChooser.showSaveDialog(parentStage);		
 		
@@ -1086,7 +1091,7 @@ public class MainController {
 	public void downloadFileAction(ActionEvent event) {
 		log.debug("Download file action started");
 		fileChooser.getExtensionFilters().clear();
-		fileChooser.getExtensionFilters().add(filterBayEOS);
+		fileChooser.getExtensionFilters().add(filterBayEOS);		
 		File file = fileChooser.showSaveDialog(parentStage);
 		if (file != null) {	
 			try {
