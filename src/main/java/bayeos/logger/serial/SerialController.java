@@ -28,9 +28,7 @@ public class SerialController {
 	@FXML 
 	private ChoiceBox<String>portList;
 	
-	@FXML
-	private ChoiceBox<Integer>baudRateList;
-	
+		
 	
 
 	/**
@@ -51,9 +49,7 @@ public class SerialController {
 	}
 	
 	
-	public void setBaudrate(int baudrate){
-		baudRateList.setValue(baudrate);		
-	}
+	
 	
 	public void setPort(String port){
 		portList.setValue(port);
@@ -76,10 +72,7 @@ public class SerialController {
 		stage.close();
 	}
 
-	public int getBaudrate() {
-		return baudRateList.getValue();
-	}
-
+	
 	public String getPort() {		
 		return portList.getValue();
 	}

@@ -5,14 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javafx.concurrent.Task;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
+import bayeos.frame.Parser;
 import bayeos.logger.TaskController;
 import de.unibayreuth.bayeos.connection.Connection;
-import frame.parser.DataReader;
+import javafx.concurrent.Task;
 
 
 
@@ -55,9 +54,9 @@ public class UploadBoardTask extends Task<Boolean> {
 			List<String> expFrames = new ArrayList<String>(frames.size());
 			for(int i=0;i<frames.size();i++) {
 				
-				DataReader reader = new DataReader();
-				Map<String, Object> ret = reader.read(Base64.decodeBase64(frames.get(i)), board.getName(), new Date());
-				Date t = (Date) ret.get("result_time");				
+				
+				Map<String, Object> ret = Parser.parse(Base64.decodeBase64(frames.get(i)));
+				Date t = new Date(((long)(ret.get("ts"))/(1000*1000)));								
 				if (t!=null){																
 						expFrames.add(frames.get(i));									    
 				}

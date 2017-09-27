@@ -1,5 +1,7 @@
 package bayeos.logger;
 
+import static bayeos.logger.LoggerConstants.SM_RESET;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,6 +23,29 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+
+import bayeos.file.CSVFile;
+import bayeos.file.ExcelFile;
+import bayeos.file.SeriesFile;
+import bayeos.frame.FrameParserException;
+import bayeos.frame.Parser;
+import bayeos.logger.dump.Board;
+import bayeos.logger.dump.DAO;
+import bayeos.logger.dump.DataModeChooser;
+import bayeos.logger.dump.DownloadBulkTask;
+import bayeos.logger.dump.DownloadFileTask;
+import bayeos.logger.dump.DownloadFrameTask;
+import bayeos.logger.dump.ExportFileTask;
+import bayeos.logger.dump.UploadBoard;
+import bayeos.logger.dump.UploadBoardTask;
+import bayeos.logger.pref.PrefController;
+import bayeos.logger.serial.SerialController;
+import bayeos.logger.serial.SerialDeviceFX;
+import de.unibayreuth.bayeos.connection.Connection;
+import de.unibayreuth.bayeos.connection.ConnectionFactory;
+import de.unibayreuth.bayeos.connection.ConnectionFileAdapter;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyMapProperty;
@@ -54,7 +79,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -73,35 +97,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import logger.DataMode;
-import logger.LoggerConnection;
-import logger.LoggerFileReader;
-import logger.StopMode;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
-
-import serial.SerialConnection;
-import bayeos.file.CSVFile;
-import bayeos.file.ExcelFile;
-import bayeos.file.SeriesFile;
-import bayeos.logger.dump.Board;
-import bayeos.logger.dump.DAO;
-import bayeos.logger.dump.DataModeChooser;
-import bayeos.logger.dump.DownloadBulkTask;
-import bayeos.logger.dump.DownloadFileTask;
-import bayeos.logger.dump.DownloadFrameTask;
-import bayeos.logger.dump.ExportFileTask;
-import bayeos.logger.dump.UploadBoard;
-import bayeos.logger.dump.UploadBoardTask;
-import bayeos.logger.pref.PrefController;
-import bayeos.logger.serial.FindPortTask;
-import bayeos.logger.serial.SerialConnectionFX;
-import bayeos.logger.serial.SerialController;
-import de.unibayreuth.bayeos.connection.Connection;
-import de.unibayreuth.bayeos.connection.ConnectionFactory;
-import de.unibayreuth.bayeos.connection.ConnectionFileAdapter;
-import frame.parser.DataReader;
 
 public class MainController {
 
@@ -182,15 +178,15 @@ public class MainController {
 	@FXML
 	private TabPane tabPane;
 
-	private SerialConnectionFX serialCon;
-	private LoggerConnection logCon;
+	private SerialDeviceFX serialDev;
+	
+	private bayeos.logger.Logger logger;
 
 	private File dbFolder;
 	private Preferences pref = Preferences.userNodeForPackage(MainApp.class);
 	private Stage parentStage;
 
-	private ObservableList<Board> boardList = FXCollections
-			.observableArrayList();
+	private ObservableList<Board> boardList = FXCollections.observableArrayList();
 
 	private LiveService liveService;
 
@@ -228,23 +224,23 @@ public class MainController {
 		ico = new Image("/images/package_green.png");
 
 		liveService = new LiveService();
-		serialCon = new SerialConnectionFX();
+		serialDev = new SerialDeviceFX();
 
 		// Logger
-		btnConnect.visibleProperty().bind(serialCon.connectedProperty().not());
-		btnDisconnect.visibleProperty().bind(serialCon.connectedProperty());
+		btnConnect.visibleProperty().bind(serialDev.connectedProperty().not());
+		btnDisconnect.visibleProperty().bind(serialDev.connectedProperty());
 
 		tabLogger.disableProperty().bind(liveService.runningProperty());
 		tabDumps.disableProperty().bind(liveService.runningProperty());
 
-		lblConnection.textProperty().bind(serialCon.messageProperty());
-		frmLogger.disableProperty().bind(serialCon.connectedProperty().not());
+		lblConnection.textProperty().bind(serialDev.messageProperty());
+		frmLogger.disableProperty().bind(serialDev.connectedProperty().not());
 
-		btnDownload.disableProperty().bind(serialCon.connectedProperty().not());
+		btnDownload.disableProperty().bind(serialDev.connectedProperty().not());
 		
-		btnDownloadFile.disableProperty().bind(serialCon.connectedProperty().not().or(logVersion.lessThan(1.2)));
+		btnDownloadFile.disableProperty().bind(serialDev.connectedProperty().not().or(logVersion.lessThan(1.2)));
 								
-		btnReset.disableProperty().bind(serialCon.connectedProperty().not());
+		btnReset.disableProperty().bind(serialDev.connectedProperty().not());
 
 		ConnectionFactory.setFileAdapter(new ConnectionFileAdapter("gateway", new File(System.getProperty("user.home"))));
 
@@ -267,8 +263,8 @@ public class MainController {
 
 		
 		btnLiveStart.disableProperty()
-				.bind(serialCon.connectedProperty().not());
-		btnLiveStop.disableProperty().bind(serialCon.connectedProperty().not());
+				.bind(serialDev.connectedProperty().not());
+		btnLiveStop.disableProperty().bind(serialDev.connectedProperty().not());
 		btnLiveStop.visibleProperty().bind(liveService.runningProperty());
 		btnLiveStart.visibleProperty()
 				.bind(liveService.runningProperty().not());
@@ -384,13 +380,14 @@ public class MainController {
 		}
 
 	}
+	
+	
 
 	@FXML
 	public void connectSerialAction(ActionEvent event) {
-		log.debug("Connect serial action");
-		
-		Set<String> ports = SerialConnection.getAvailableSerialPorts();
+		log.debug("Connect serial action");		
 
+		Set<String> ports = serialDev.getPortNames();
 		if (ports.size() < 1) {
 			Dialogs.showWarningDialog(parentStage,
 					"No serial port found, please check \n your hardware.");
@@ -421,12 +418,10 @@ public class MainController {
 				ctrl.setPort(ports.iterator().next());
 			}
 
-			// Default baudrate values from user preferences
-			ctrl.setBaudrate(pref.getInt("baudrate", 38400));
-
+			
 			stage.showAndWait();
 			if (ctrl.isConnectClicked()) {
-				connectSerial(ctrl.getPort(), ctrl.getBaudrate());
+				connectSerial(ctrl.getPort());
 			}
 
 		} catch (IOException e) {
@@ -438,13 +433,13 @@ public class MainController {
 	}
 	
 	
-	public void connectSerial(String port, Integer baudrate){
-		if (!serialCon.connect(port, baudrate,pref.getInt("timeout",10000))){
+	public void connectSerial(String port){
+		if (!serialDev.connect(port)){
 			Dialogs.showWarningDialog(parentStage, String.format("Failed to open connection on port %s",port));
 			return;
 		}
 		pref.put("port", port);		
-		logCon = new LoggerConnection(serialCon.getInputStream(),serialCon.getOutputStream());
+		logger = new bayeos.logger.Logger(serialDev);
 		queryMetaDataAction(null);
 	}
 
@@ -455,19 +450,19 @@ public class MainController {
 		Date nextFrameTime;
 		try {
 
-			String version = logCon.getVersion();			
+			String version = logger.getVersion();			
 			txtLoggerVersion.setText(version);			
 			if (version!=null){
 				logVersion.setValue(Float.valueOf(version));	
 			} 
 			
 
-			name = logCon.getName();
+			name = logger.getName();
 			if (name == null || name.isEmpty()) {
 				String res = Dialogs.showInputDialog(parentStage,"Please set logger name.");
 				if (res != null) {
 					try {
-						logCon.setName(res);
+						logger.setName(res);
 						name = res;
 					} catch (IOException e) {
 						name = "<not set>";
@@ -478,15 +473,15 @@ public class MainController {
 			}
 			txtLoggerName.setText(name);
 
-			interval = logCon.getSamplingInterval();
+			interval = logger.getSamplingInterval();
 			txtLoggerSampleInterval.setText((interval == null) ? "<not set>"
 					: String.valueOf(interval));
 
-			time = logCon.getTime();
+			time = logger.getTime();
 			txtLoggerCurrentDate.setText((time == null) ? "<not set>"
 					: DateFormat.getDateTimeInstance().format(time));
 
-			nextFrameTime = logCon.getDateOfNextFrame();
+			nextFrameTime = logger.getDateOfNextFrame();
 			txtLoggerNextFrame.setText((nextFrameTime == null) ? "<not set>"
 					: DateFormat.getDateTimeInstance().format(
 							nextFrameTime));
@@ -503,8 +498,8 @@ public class MainController {
 			log.error(e);
 			Dialogs.showErrorDialog(parentStage,
 					"Failed to get meta informations from logger.\n"
-							+ serialCon.messageProperty().get());
-			serialCon.disconnect();
+							+ serialDev.messageProperty().get());
+			serialDev.disconnect();
 			return;
 		}
 
@@ -519,7 +514,7 @@ public class MainController {
 								null, "Please confirm", DialogOptions.YES_NO);
 				if (r == DialogResponse.YES) {
 					try {
-						logCon.setTime(new Date());
+						logger.setTime(new Date());
 					} catch (IOException e) {
 						log.error(e);
 						Dialogs.showErrorDialog(parentStage,
@@ -540,7 +535,7 @@ public class MainController {
 		txtLoggerCurrentDate.setText(null);
 		txtLoggerNextFrame.setText(null);
 		txtLoggerNewFrameCount.setText(null);
-		serialCon.disconnect();
+		serialDev.disconnect();
 	}
 
 	@FXML
@@ -624,7 +619,7 @@ public class MainController {
 	private class LiveService extends Service<Void> {
 		private LiveDataTask task;
 		
-		private Map<Integer, ChartPane> charts;
+		private Map<String, ChartPane> charts;
 
 		public void stop() {
 			task.dataReceivedProperty().removeListener(listener);
@@ -633,11 +628,11 @@ public class MainController {
 			charts = null;
 		}
 
-		MapChangeListener<Integer, Float> listener = new MapChangeListener() {
+		MapChangeListener<String, Float> listener = new MapChangeListener() {
 			@Override
 			public void onChanged(Change change) {
 				if (change.wasAdded()) {
-					Integer channel = (Integer) change.getKey();
+					String channel = (String) change.getKey();
 					Float value = (Float) change.getValueAdded();
 					// log.debug("Channel:" + channel + " Value:" + value);
 					if (!charts.containsKey(channel)) {
@@ -654,7 +649,7 @@ public class MainController {
 
 		@Override
 		protected Task<Void> createTask() {
-			charts = new HashMap<Integer, ChartPane>(20);
+			charts = new HashMap<String, ChartPane>(20);
 			task = new LiveDataTask();
 			task.dataReceivedProperty().addListener(listener);
 			return task;
@@ -663,7 +658,7 @@ public class MainController {
 	
 	private class ChartPane extends BorderPane {
 		
-		private Integer channel;		
+		private String channel;		
 		private LineChart<Number, Number> lineChart;
 		private StackPane valuePane;				
 		private Float lastValue;
@@ -687,7 +682,7 @@ public class MainController {
 			
 		}
 		
-		public ChartPane(Integer channel) {
+		public ChartPane(String channel) {
 			this.channel = channel;
 			
 			this.lineChart = createLineChart(); 			
@@ -736,7 +731,7 @@ public class MainController {
 			XYChart.Series<Number, Number> series = new XYChart.Series<Number, Number>();
 			lc.getData().add(series);
 
-			if (channel % 2 == 0) {
+			if (lc.getData().size()%2 == 0) {
 				series.getNode().setStyle(
 						"-fx-stroke: red; -fx-background-color: red,white;");
 			} else {
@@ -780,14 +775,14 @@ public class MainController {
 
 	private class LiveDataTask extends Task<Void> {
 		boolean active = true;
-		private SimpleMapProperty<Integer, Float> dataReceived = new SimpleMapProperty(
+		private SimpleMapProperty<String, Float> dataReceived = new SimpleMapProperty(
 				this, "dataReceived", FXCollections.observableHashMap());
 
-		public final ObservableMap<Integer, Float> getDataReceived() {
+		public final ObservableMap<String, Float> getDataReceived() {
 			return dataReceived.get();
 		}
 
-		public final ReadOnlyMapProperty<Integer, Float> dataReceivedProperty() {
+		public final ReadOnlyMapProperty<String, Float> dataReceivedProperty() {
 			return dataReceived;
 		}
 
@@ -796,28 +791,32 @@ public class MainController {
 		}
 
 		@Override
-		public Void call() {
-			DataReader reader =  new DataReader();
+		public Void call() {			
 			try {
-				logCon.startLiveData();
+				logger.startLiveData();
 				 
-				while (active) {
-															
-					final Map<String,Object> data = reader.read(logCon.readData(), "COM", new Date());
-					
+				while (active) {									
+					Map<String,Object> data = Parser.parse(logger.readData());															
 					Platform.runLater(new Runnable() {
 						@Override
-						public void run() {
-							// log.debug("Received frame:" + f.toString());
+						public void run() {							
 							dataReceived.clear();
-							dataReceived.get().putAll((Map<Integer,Float>) data.get("values"));
+							dataReceived.get().putAll((Map<String,Float>) data.get("value"));
 						}
 					});
 				}
-				logCon.stopLiveData();
+				
 			} catch (IOException e) {
 				log.error(e.getMessage());
-			} 
+			} catch (FrameParserException e) {
+				log.error(e.getMessage());
+			} finally {				
+				try {
+					logger.stopLiveData();
+				} catch (IOException e) {
+					log.error(e.getMessage());
+				}
+			}
 			return null;
 		}
 	}
@@ -833,9 +832,9 @@ public class MainController {
 			liveService.stop();
 		}
 
-		if (serialCon.connectedProperty().getValue()) {
+		if (serialDev.connectedProperty().getValue()) {
 			try {
-				serialCon.disconnect();
+				serialDev.disconnect();
 			} catch (Exception e) {
 				log.warn(e.getMessage());
 			}
@@ -851,7 +850,7 @@ public class MainController {
 		log.debug("Set current date action");
 		try {
 			Date d = new Date();
-			logCon.setTime(d);
+			logger.setTime(d);
 			txtLoggerCurrentDate.setText(DateFormat.getDateTimeInstance()
 					.format(d));
 		} catch (IOException e) {
@@ -872,7 +871,7 @@ public class MainController {
 						null, "Reset logger data", DialogOptions.YES_NO);
 		if (res.equals(DialogResponse.YES)) {
 			try {
-				logCon.stopData(StopMode.RESET);
+				logger.stopData(SM_RESET);
 				queryMetaDataAction(null);
 			} catch (IOException e) {
 				log.error(e.getMessage());
@@ -889,7 +888,7 @@ public class MainController {
 				"Set logger name");
 		if (input != null) {
 			try {
-				logCon.setName(input);
+				logger.setName(input);
 				txtLoggerName.setText(input);
 			} catch (IOException e) {
 				log.error(e.getMessage());
@@ -928,7 +927,7 @@ public class MainController {
 				"Interval [seconds]:", null, "Set sampling interval");
 		if (input != null) {
 			try {
-				logCon.setSamplingInterval(Integer.valueOf(input));
+				logger.setSamplingInterval(Integer.valueOf(input));
 				txtLoggerSampleInterval.setText(input);
 			} catch (IOException e) {
 				log.error(e.getMessage());
@@ -957,7 +956,7 @@ public class MainController {
 					board.Id = DAO.getBoardDAO().add(board);
 					in = new BufferedInputStream(new FileInputStream(file));					
 					List<String> frameBuffer = new ArrayList<String>(1000);					
-					LoggerFileReader frameReader = new LoggerFileReader(in);								
+					BulkReader frameReader = new BulkReader(in);								
 					int frameCount = 0;
 					byte[] data;
 					while ((data = frameReader.readData()) != null) {
@@ -1055,12 +1054,12 @@ public class MainController {
 		Board b = null;
 		Task<Board> task;
 		try {
-			DataMode mode = dataModeChooser.showDialog(parentStage);
-			if (mode == null) return;			
+			byte mode = dataModeChooser.showDialog(parentStage);
+			if (mode == -1) return;			
 			if (logVersion.get() >= 1.2) {
-				task = new DownloadBulkTask(logCon, mode);
+				task = new DownloadBulkTask(logger, mode);
 			} else {
-				task = new DownloadFrameTask(logCon, mode);
+				task = new DownloadFrameTask(logger, mode);
 			}
 			taskDialog.showDialog(parentStage, task);
 			try {
@@ -1095,29 +1094,13 @@ public class MainController {
 		File file = fileChooser.showSaveDialog(parentStage);
 		if (file != null) {	
 			try {
-				taskDialog.showDialog(parentStage, new DownloadFileTask(logCon, file));
+				taskDialog.showDialog(parentStage, new DownloadFileTask(logger, file));
 			} catch (IOException e) {
 				Dialogs.showErrorDialog(parentStage, "Failed to download file.");
 			}								
 		}
 	}
 
-	public void autoConnect() {
-		int baudRate = pref.getInt("baudrate", 38400);
-		Task<String> task = new FindPortTask(baudRate);		
-		try {
-			taskDialog.showDialog(parentStage,task);
-			String port = task.get();
-			if (port == null){
-				log.warn("No logger found");
-			} else {
-				connectSerial(task.get(),baudRate);	
-			}								
-		} catch (InterruptedException | ExecutionException | IOException e) {
-			Dialogs.showErrorDialog(parentStage, "Autoconnect failed.");
-		}
-		
-		
-	}
+	
 
 }

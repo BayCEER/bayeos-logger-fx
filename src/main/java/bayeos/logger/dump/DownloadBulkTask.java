@@ -8,27 +8,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import javafx.concurrent.Task;
-import logger.BufferCommand;
-import logger.BulkWriter;
-import logger.DataMode;
-import logger.LoggerFileReader;
-import logger.LoggerConnection;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
+import bayeos.logger.BulkReader;
+import bayeos.logger.BulkWriter;
 import bayeos.logger.TaskController;
+import javafx.concurrent.Task;
+import static bayeos.logger.LoggerConstants.*;
 
 
 public class DownloadBulkTask extends Task<Board> {
-	LoggerConnection logCon;
-	DataMode mode;
+	bayeos.logger.Logger logger;
+	byte mode;
 	
 	private static Logger log = Logger.getLogger(DownloadBulkTask.class);
 	
-	public DownloadBulkTask(LoggerConnection con, DataMode mode) {
-		this.logCon = con;
+	public DownloadBulkTask(bayeos.logger.Logger logger, byte mode) {
+		this.logger = logger;
 		this.mode = mode;
 	}
 
@@ -40,15 +37,16 @@ public class DownloadBulkTask extends Task<Board> {
 		try {
 		
 		log.debug("Start download bulk task");
-		updateTitle("Download data from " + logCon.getName());
+		String name = logger.getName();
+		updateTitle("Download data from " + name);
 		
 		long startTime = new Date().getTime();
-		board = new Board(logCon.getName());
+		board = new Board(name);
 		
 	
 
 			long read = 0;
-			long bytes = logCon.startBulkData(mode);
+			long bytes = logger.startBulkData(mode);
 			if (bytes == 0) {
 				return null;
 			}
@@ -80,7 +78,7 @@ public class DownloadBulkTask extends Task<Board> {
 		            }
 					return board;					
 				}
-				int[] bulk = logCon.readBulk();
+				byte[] bulk = logger.readBulk();
 				bulkBytes=bulkBytes+bulk.length;
 				read = read + bulk.length-5;					
 				bulkWriter.write(bulk);						
@@ -94,13 +92,13 @@ public class DownloadBulkTask extends Task<Board> {
 			
 			
 			bulkIn = new BufferedInputStream(new FileInputStream(file));
-			LoggerFileReader fileReader = new LoggerFileReader(bulkIn);
+			BulkReader fileReader = new BulkReader(bulkIn);
 						
 			int frameCount = 0;
 			startTime = new Date().getTime();
 			byte[] da;
 			while ((da = fileReader.readData()) != null) {					
-				// log.debug(String.format("Write:%d\tTotal:%d",frameReader.getBytesRead(),bytes));
+				//log.debug(String.format("Write:%d\tTotal:%d",frameReader.getBytesRead(),bytes));
 				updateProgress(fileReader.getBytesRead(bytes),bytes);
 				updateMessage(TaskController.getUpdateMsg("Bulk import", fileReader.getBytesRead(bytes), bytes, startTime));
 				if (isCancelled()) {	
@@ -116,13 +114,17 @@ public class DownloadBulkTask extends Task<Board> {
 				DAO.getFrameDAO().addFrame(Base64.encodeBase64String(da), board.Id);
 				frameCount++;
 			}
+			
+			log.debug("Update board");
 			board.Start = fileReader.getMinStart();
 			board.End = fileReader.getMaxStart();
 			board.Records = frameCount;
 			DAO.getBoardDAO().update(board);
+			
 
-			logCon.sendBufferCommand(BufferCommand.SET_READ_TO_LAST_OF_BINARY_END_POS);
-							
+			log.debug("Send buffer command.");
+			logger.sendBufferCommand(BC_SET_READ_TO_LAST_OF_BINARY_END_POS);
+			
 			return board;
 		
 		} catch (Exception e) {
@@ -130,7 +132,7 @@ public class DownloadBulkTask extends Task<Board> {
 			return board;
 		} finally {
 			try {
-				logCon.breakSocket(); logCon.stopMode();} catch (IOException e) {log.error(e);}
+				logger.breakSocket(); logger.stopMode();} catch (IOException e) {log.error(e);}
 			try { if (bulkOut != null) bulkOut.close();	} catch (IOException e) {log.error(e);}
 			try { if (bulkIn != null) bulkIn.close();} catch (IOException e) {log.error(e);}
 			

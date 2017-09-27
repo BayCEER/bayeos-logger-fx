@@ -1,29 +1,28 @@
 package bayeos.logger.dump;
 
 import java.util.Date;
+
+
 import java.util.Map;
 
 import javafx.concurrent.Task;
-import logger.DataMode;
-import logger.LoggerConnection;
-import logger.StopMode;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
-
+import bayeos.frame.Parser;
 import bayeos.logger.TaskController;
-import binary.IntArray;
-import frame.parser.DataReader;
+import static bayeos.logger.LoggerConstants.*;
 
 public class DownloadFrameTask extends Task<Board> {
 
-	LoggerConnection logCon;
-	DataMode mode;
+	bayeos.logger.Logger logger;
+	byte mode;
+	
 
 	private static Logger log = Logger.getLogger(DownloadFrameTask.class);
 
-	public DownloadFrameTask(LoggerConnection con, DataMode mode) {
-		this.logCon = con;
+	public DownloadFrameTask(bayeos.logger.Logger logger, byte mode) {
+		this.logger = logger;
 		this.mode = mode;
 	}
 
@@ -41,11 +40,12 @@ public class DownloadFrameTask extends Task<Board> {
 			Integer frames = 0;
 			
 			log.debug("Start download frame task");
-			updateTitle("Download data from " + logCon.getName());
+			String name = logger.getName();
+			updateTitle("Download data from " + name);
 			long startTime = new Date().getTime();
-			board = new Board(logCon.getName());
+			board = new Board(name);
 			
-			long bytes = logCon.startData(mode);
+			long bytes = logger.startData(mode);
 			if (bytes == 0) {
 				return null;
 			}
@@ -67,13 +67,14 @@ public class DownloadFrameTask extends Task<Board> {
 					return board;
 				}
 					
-				byte[] b = IntArray.toByteArray(logCon.readData(),0);				
+				byte[] b = logger.readData();				
 				read = read + b.length;
 				
-				DataReader reader = new DataReader();				
-				Map<String,Object> ret = reader.read(b,"COM",new Date());
-				if (ret.get("values") != null) {					
-					Date rs = (Date) ret.get("result_time");
+								
+				Map<String,Object> ret = Parser.parse(b);
+				if (ret.get("value") != null) {
+					
+					Date rs = new Date(((long)(ret.get("ts"))/(1000*1000)));					
 					if (frames == 0) {
 						startDate = rs; endDate = rs;
 					}					
@@ -99,12 +100,12 @@ public class DownloadFrameTask extends Task<Board> {
 			board.Start = startDate;
 			board.Records = frames;
 			DAO.getBoardDAO().update(board);
-			logCon.stopData(StopMode.STOP);
+			logger.stopData(SM_STOP);
 			return board;
 
 		} catch (Exception e) {
 			log.error(e.getMessage());
-			logCon.stopData(StopMode.CANCEL);
+			logger.stopData(SM_CANCEL);
 			return board;
 		}
 	}

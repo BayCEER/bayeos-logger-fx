@@ -16,8 +16,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import bayeos.file.SeriesFile;
+import bayeos.frame.Parser;
 import bayeos.logger.TaskController;
-import frame.parser.DataReader;
 
 public class ExportFileTask extends Task<Boolean> {
 
@@ -65,10 +65,11 @@ public class ExportFileTask extends Task<Boolean> {
 				}
 				
 				String s = rs.getString(1);			
-				DataReader reader = new DataReader();
-				Map<String,Object> ret = reader.read(Base64.decodeBase64(s), board.getName(), new Date());
-				Map<Integer, Float> values = (Map<Integer, Float>) ret.get("values");
-				Date resTime = (Date)ret.get("result_time");				
+				
+				Map<String,Object> ret = Parser.parse(Base64.decodeBase64(s));
+				Map<Integer, Float> values = (Map<Integer, Float>) ret.get("value");
+				
+				Date resTime = new Date(((long)(ret.get("ts"))/(1000*1000)));												
 				if (resTime != null){
 					if (!file.writeRow(resTime, values)){
 						return false;						

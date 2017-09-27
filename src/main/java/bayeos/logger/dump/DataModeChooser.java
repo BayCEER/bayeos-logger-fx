@@ -2,23 +2,21 @@ package bayeos.logger.dump;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
+import bayeos.logger.MainApp;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import logger.DataMode;
-
-import org.apache.log4j.Logger;
-
-import bayeos.logger.MainApp;
 
 public class DataModeChooser {
 	
 	private static Logger log = Logger.getLogger(DataModeChooser.class);
 	
-	public DataMode showDialog(Stage parentStage) throws IOException {				
+	public byte showDialog(Stage parentStage) throws IOException {				
 		FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/dataModeChooserPane.fxml"));
 		Parent page = (Parent) loader.load();	
 		Stage stage = new Stage();
@@ -34,7 +32,7 @@ public class DataModeChooser {
 		if (ctrl.isOkPressed()){
 			return ctrl.getDataMode();
 		} else {
-			return null;
+			return -1;
 		}												
 	}
 	

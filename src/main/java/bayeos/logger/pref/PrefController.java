@@ -38,7 +38,6 @@ import de.unibayreuth.bayeos.connection.ConnectionFactory;
 public class PrefController {
 	@FXML private Button btnCancel; 
     @FXML private CheckBox chkDeleteDump;
-    @FXML private CheckBox chkAutoDetect;
     @FXML private CheckBox chkTimeShift;
     @FXML private Button okButton;
     @FXML private TableView<ConnectionFX> conTable;
@@ -74,10 +73,7 @@ public class PrefController {
     	log.debug("Initialize PrefController");  
     	
     	
-    	// StartUp     	
-    	chkAutoDetect.selectedProperty().bindBidirectional(autoDetect);
-    	autoDetect.set(pref.getBoolean("autoDetect", false));
-    	
+    	// StartUp     	    	
     	
     	chkTimeShift.selectedProperty().bindBidirectional(checkTimeShift);
     	checkTimeShift.set(pref.getBoolean("checkTimeShift", true));

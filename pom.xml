@@ -7,7 +7,7 @@
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-logger-fx</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.7</version>	
+	<version>1.0.10</version>	
 	<description>Application to communicate with a BayEOS Logger over serial line.</description>
 	
 	<parent>
@@ -21,7 +21,14 @@
 	<properties>
 		<codebase>http://www.bayceer.uni-bayreuth.de/edv/bayeos</codebase>
 		<publish.path>${publish.webstart.path}</publish.path>
-		<jnlpTitle>BayEOS Logger ${project.version}</jnlpTitle>		
+		<jnlpTitle>BayEOS Logger ${project.version}</jnlpTitle>
+		
+		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>		
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>	
+			
 	</properties>
 			
 	<build>
@@ -57,7 +64,7 @@
 				-->
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>webstart-maven-plugin</artifactId>
-				<version>1.0-beta-6</version>
+				<version>1.0-beta-7</version>
 				
 				<executions>
 					<execution>
@@ -88,10 +95,10 @@
 				</configuration>
 			</plugin>
 			
-			<plugin>
-				<!-- Create jar version 
+			<!-- <plugin>
+				Create jar version 
 				http://zenjava.com/javafx/maven/
-				-->			
+							
 				<groupId>com.zenjava</groupId>
 				<artifactId>javafx-maven-plugin</artifactId>
 				<version>2.0</version>
@@ -106,7 +113,7 @@
 						</configuration>
 					</execution>	
 				</executions>
-			</plugin>
+			</plugin> -->
 			<!-- Deploy on File Server -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -140,32 +147,32 @@
     </plugins>
 	</build>
 
-	<dependencies>		
-		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>javafx</artifactId>
-			<version>2.2</version>
-			<systemPath>${java.home}/lib/jfxrt.jar</systemPath>
-			<scope>system</scope>
-		</dependency>
+	<dependencies>				
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.neuronrobotics</groupId>
 			<artifactId>nrjavaserial</artifactId>
-			<version>3.7.5.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
-			<artifactId>bayeos-logger-api</artifactId>
-			<version>2.0.3</version>
-		</dependency> 
+			<version>3.12.1</version>
+		</dependency> -->
+			<dependency>
+  		<groupId>org.scream3r</groupId>
+  		<artifactId>jssc</artifactId>
+  		<version>2.8.0</version>
+  		</dependency>
+ 
 		
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-password-file</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
+			<artifactId>bayeos-logger</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		
 		
 		<dependency>
 			<groupId>org.apache.derby</groupId>
@@ -195,6 +202,7 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.9</version>
 		</dependency>
+		
 	</dependencies>
 	
 		

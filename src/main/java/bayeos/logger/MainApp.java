@@ -62,9 +62,7 @@ public class MainApp extends Application {
         stage.setScene(scene);
         stage.show();
                      
-        if (pref.getBoolean("autoDetect",false)){
-        		c.autoConnect();	       	
-        }
+        
 		
 	}
 }

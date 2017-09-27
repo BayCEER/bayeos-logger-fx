@@ -1,11 +1,11 @@
 package bayeos.logger.dump;
 
+import bayeos.logger.LoggerConstants;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.stage.Stage;
-import logger.DataMode;
 
 public class DataModeController {
 	
@@ -41,11 +41,11 @@ public class DataModeController {
 	public boolean isOkPressed() {
 			return okPressed;
 	}
-	public DataMode getDataMode() {
+	public byte getDataMode() {
 		if (rabFull.isSelected()) {
-			return DataMode.FULL;
+			return LoggerConstants.DM_FULL;
 		} else {
-			return DataMode.NEW;
+			return LoggerConstants.DM_NEW;
 		}		
 	}
 	
