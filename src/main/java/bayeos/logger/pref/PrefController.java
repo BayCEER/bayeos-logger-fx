@@ -86,7 +86,7 @@ public class PrefController {
     	// Upload
         colConName.setCellValueFactory(new PropertyValueFactory<Connection, String>("name"));		
     	colConHost.setCellValueFactory(new PropertyValueFactory<Connection, String>("host"));
-    	colConUser.setCellValueFactory(new PropertyValueFactory<Connection, String>("userName"));
+    	colConUser.setCellValueFactory(new PropertyValueFactory<Connection, String>("user"));
     	    	    	    	    	   	   	
     	try {
     		for(Connection con:ConnectionFactory.getFileAdpater().read()){
