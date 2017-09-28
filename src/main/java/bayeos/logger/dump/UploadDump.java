@@ -16,10 +16,10 @@ import javafx.stage.Stage;
 import bayeos.logger.MainApp;
 import de.unibayreuth.bayeos.connection.ConnectionFactory;
 
-public class UploadBoard {
+public class UploadDump {
 	private Preferences pref = Preferences.userNodeForPackage(MainApp.class);
 	
-	public Map<String,Object>  showDialog(Stage parentStage, Board board) throws IOException {				
+	public Map<String,Object>  showDialog(Stage parentStage, DumpFile dumpFile) throws IOException {				
 		FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/fxml/uploadPane.fxml"));
 		Parent page = (Parent) loader.load();	
 				
@@ -30,7 +30,7 @@ public class UploadBoard {
 		stage.getIcons().add(new Image("/images/package_green.png"));
 		Scene scene = new Scene(page);
 		stage.setScene(scene);		
-		UploadBoardController ctrl = loader.getController();
+		UploadDumpController ctrl = loader.getController();
 		
 		
 		List<de.unibayreuth.bayeos.connection.Connection> cons = null;

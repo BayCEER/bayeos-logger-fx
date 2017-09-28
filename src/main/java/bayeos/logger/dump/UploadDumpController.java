@@ -13,9 +13,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.stage.Stage;
 
-public class UploadBoardController {
+public class UploadDumpController {
 	
-	private static final Logger log = Logger.getLogger(UploadBoardController.class);
+	private static final Logger log = Logger.getLogger(UploadDumpController.class);
 	
 	@FXML
 	private Button btnCancel;

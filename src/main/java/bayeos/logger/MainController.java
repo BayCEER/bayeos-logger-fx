@@ -2,28 +2,27 @@ package bayeos.logger;
 
 import static bayeos.logger.LoggerConstants.SM_RESET;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.SQLException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 
 import bayeos.file.CSVFile;
@@ -31,15 +30,14 @@ import bayeos.file.ExcelFile;
 import bayeos.file.SeriesFile;
 import bayeos.frame.FrameParserException;
 import bayeos.frame.Parser;
-import bayeos.logger.dump.Board;
-import bayeos.logger.dump.DAO;
 import bayeos.logger.dump.DataModeChooser;
 import bayeos.logger.dump.DownloadBulkTask;
 import bayeos.logger.dump.DownloadFileTask;
-import bayeos.logger.dump.DownloadFrameTask;
+import bayeos.logger.dump.DumpFile;
+import bayeos.logger.dump.DumpFileRepository;
 import bayeos.logger.dump.ExportFileTask;
-import bayeos.logger.dump.UploadBoard;
-import bayeos.logger.dump.UploadBoardTask;
+import bayeos.logger.dump.UploadDump;
+import bayeos.logger.dump.UploadDumpTask;
 import bayeos.logger.pref.PrefController;
 import bayeos.logger.serial.SerialController;
 import bayeos.logger.serial.SerialDeviceFX;
@@ -67,6 +65,8 @@ import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialogs;
 import javafx.scene.control.Dialogs.DialogOptions;
@@ -90,6 +90,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
@@ -124,6 +125,9 @@ public class MainController {
 	@FXML
 	private Button btnUpload;
 	@FXML
+	private Button btnInfoFile;
+	
+	@FXML
 	private Label lblConnection;
 	@FXML
 	private MenuItem mnuClose;
@@ -150,20 +154,23 @@ public class MainController {
 	private Label txtLoggerNextFrame;
 	@FXML
 	private Label txtLoggerNewFrameCount;
+	
 	@FXML
-	private TableView<Board> boardTable;
+	private TableView<DumpFile> dumpFileTable;
 
 	@FXML
-	private TableColumn<Board, String> colBoardName;
+	private TableColumn<DumpFile, String> coOrigin;
+	
 	@FXML
-	private TableColumn<Board, Date> colBoardStart;
+	private TableColumn<DumpFile, Date> coLastModified;
+	
 	@FXML
-	private TableColumn<Board, Date> colBoardEnd;
+	private TableColumn<DumpFile, Long> coLength;
+	
 	@FXML
-	private TableColumn<Board, Integer> colBoardRecords;
-	@FXML
-	private TableColumn<Board, Integer> colBoardId;
-
+	private TableColumn<DumpFile, String> coPath;
+	
+		
 	@FXML
 	private Tab tabLogger;
 	@FXML
@@ -182,11 +189,11 @@ public class MainController {
 	
 	private bayeos.logger.Logger logger;
 
-	private File dbFolder;
+		
 	private Preferences pref = Preferences.userNodeForPackage(MainApp.class);
 	private Stage parentStage;
 
-	private ObservableList<Board> boardList = FXCollections.observableArrayList();
+	private ObservableList<DumpFile> dumpFileList = FXCollections.observableArrayList();
 
 	private LiveService liveService;
 
@@ -214,6 +221,10 @@ public class MainController {
 	private Image ico;
 	
 		
+	public static String userHomeDir = System.getProperty("user.home", ".");
+	public static String systemDir = userHomeDir + File.separatorChar + ".bayeos-logger";	
+	public static File dumpFileDir = new File(systemDir + File.separatorChar + "dumpfiles");
+
 
 	@FXML
 	private void initialize() {
@@ -269,16 +280,13 @@ public class MainController {
 		btnLiveStart.visibleProperty()
 				.bind(liveService.runningProperty().not());
 
-		colBoardName
-				.setCellValueFactory(new PropertyValueFactory<Board, String>(
-						"Name"));
-		colBoardName
-				.setCellFactory(new Callback<TableColumn<Board, String>, TableCell<Board, String>>() {
+		coOrigin.setCellValueFactory(new PropertyValueFactory<DumpFile, String>("Origin"));
+		coOrigin.setCellFactory(new Callback<TableColumn<DumpFile, String>, TableCell<DumpFile, String>>() {
 					@Override
-					public TableCell<Board, String> call(
-							TableColumn<Board, String> col) {
+					public TableCell<DumpFile, String> call(
+							TableColumn<DumpFile, String> col) {
 						final Image ico = new Image("/images/package_green.png");
-						return new TableCell<Board, String>() {
+						return new TableCell<DumpFile, String>() {
 							@Override
 							protected void updateItem(String item, boolean empty) {
 								super.updateItem(item, empty);
@@ -298,15 +306,40 @@ public class MainController {
 		
 
 		
-		colBoardStart.setCellValueFactory(new PropertyValueFactory<Board, Date>("Start"));
+		coLastModified.setCellValueFactory(new PropertyValueFactory<DumpFile, Date>("LastModified"));		
 		
-		colBoardEnd.setCellValueFactory(new PropertyValueFactory<Board, Date>("End"));
-		colBoardRecords.setCellValueFactory(new PropertyValueFactory<Board, Integer>("Records"));
-		colBoardId.setCellValueFactory(new PropertyValueFactory<Board, Integer>("Id"));
+		coLength.setCellValueFactory(new PropertyValueFactory<DumpFile, Long>("Length"));
+		coPath.setCellValueFactory(new PropertyValueFactory<DumpFile, String>("Path"));
 		
-		boardTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		boardTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		dumpFileTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		dumpFileTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+				
+		
+		try {
+			dumpFileList.addAll(DumpFileRepository.getFiles(dumpFileDir.getPath()));
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+		
+		dumpFileTable.setItems(dumpFileList);
+		
+		
+		log.debug("Found " + dumpFileList.size() + " dumps.");
 
+		btnUpload.disableProperty().bind(Bindings.isEmpty(dumpFileTable.getSelectionModel()
+						.getSelectedItems()));
+		btnDelete.disableProperty().bind(
+				Bindings.isEmpty(dumpFileTable.getSelectionModel()
+						.getSelectedItems()));
+		btnExportFile.disableProperty().bind(
+				Bindings.isEmpty(dumpFileTable.getSelectionModel()
+						.getSelectedItems()));
+
+		btnInfoFile.disableProperty().bind(
+				Bindings.isEmpty(dumpFileTable.getSelectionModel()
+						.getSelectedItems()));
+				
+				
 		// Pre initialized controls
 		// fileChooser 
 		fileChooser = new FileChooser();						
@@ -315,7 +348,7 @@ public class MainController {
 
 	}
 
-	static class IconNameCell extends TableCell<Board, String> {
+	static class IconNameCell extends TableCell<DumpFile, String> {
 		
 
 		@Override
@@ -330,28 +363,6 @@ public class MainController {
 				setText(null);
 			}
 		}
-	}
-
-	public void initDBStore() throws SQLException {
-
-		DAO.getBoardDAO().createTable();
-		DAO.getFrameDAO().createTable();
-		
-		boardList.addAll(DAO.getBoardDAO().findAll());
-		boardTable.setItems(boardList);
-		log.debug("Found " + boardList.size() + " dumps.");
-
-		btnUpload.disableProperty().bind(
-				Bindings.isEmpty(boardTable.getSelectionModel()
-						.getSelectedItems()));
-		btnDelete.disableProperty().bind(
-				Bindings.isEmpty(boardTable.getSelectionModel()
-						.getSelectedItems()));
-		btnExportFile.disableProperty().bind(
-				Bindings.isEmpty(boardTable.getSelectionModel()
-						.getSelectedItems()));
-		
-		
 	}
 
 	@FXML
@@ -510,7 +521,7 @@ public class MainController {
 				DialogResponse r = Dialogs
 						.showConfirmDialog(
 								parentStage,
-								"Timeshift of logger detected.\nWould you like to synchronice the logger clock with your system clock?",
+								"Timeshift of logger detected.\nWould you like to synchronize the logger clock with your system clock?",
 								null, "Please confirm", DialogOptions.YES_NO);
 				if (r == DialogResponse.YES) {
 					try {
@@ -542,20 +553,20 @@ public class MainController {
 	public void deleteDumpAction(ActionEvent event) {
 		log.debug("Delete dumps action");
 
-		Board b = boardTable.getSelectionModel().getSelectedItem();
+		DumpFile df = dumpFileTable.getSelectionModel().getSelectedItem();
 		DialogResponse res = Dialogs.showConfirmDialog(
 				parentStage,				
-				String.format("Really delete all records of %s?", "" + b.getName()),
+				String.format("Really delete all records of %s?", "" + df.getOrigin()),
 				null,null, DialogOptions.YES_NO);
 		if (res.equals(DialogResponse.YES)) {
-			log.debug(String.format("Remove %s:[%d] ", b.getName(), b.getId()));
-			try {
-				DAO.getBoardDAO().deleteBoard(b);
-			} catch (SQLException e) {
+			log.debug(String.format("Remove %s", df.getAbsolutePath()));
+			try {				
+				df.delete();
+			} catch (SecurityException e) {
 				log.error(e);
 				return;
 			}
-			boardList.remove(b);
+			dumpFileList.remove(df);
 		}
 
 	}
@@ -565,30 +576,28 @@ public class MainController {
 		log.debug("Upload start action");
 		try {
 			
-			UploadBoard  c = new UploadBoard();
-			Board board = 	boardTable.getSelectionModel().getSelectedItem();
+			UploadDump  c = new UploadDump();			
+			DumpFile dumpFile = dumpFileTable.getSelectionModel().getSelectedItem();
 						
-
-			Map<String, Object> ret = c.showDialog(parentStage, board);
+			Map<String, Object> ret = c.showDialog(parentStage, dumpFile);
 			
 			
 			if (ret!=null){
-				Task<Boolean> task = new UploadBoardTask(board,ret);
+				Task<Boolean> task = new UploadDumpTask(dumpFile,ret);
 				taskDialog.showDialog(parentStage, task);
 				
 				try {
 					if (task.get()) {
-						if (pref.getBoolean("checkDeleteDump", true)) {
-							DAO.getBoardDAO().deleteBoard(board);
-							boardList.remove(board);
-						}
-						
+						if (pref.getBoolean("checkDeleteDump", true)) {							
+							dumpFile.delete();
+							dumpFileList.remove(dumpFile);
+						}						
 						pref.put("gateway_connection", ((Connection) ret.get("con")).getName());						
 					} else {
 						Dialogs.showErrorDialog(parentStage, "Failed to upload data.");								
 					}
 					
-				} catch (SQLException | CancellationException| InterruptedException | ExecutionException e) {
+				} catch (CancellationException| InterruptedException | ExecutionException e) {
 					log.warn(e.getMessage());
 					return;
 				}				
@@ -839,8 +848,7 @@ public class MainController {
 				log.warn(e.getMessage());
 			}
 		}
-		
-		DAO.close();
+				
 					
 		parentStage.hide();
 	}
@@ -939,89 +947,123 @@ public class MainController {
 			}
 		}
 	}
+	
+	@FXML
+	public void infoFileAction(ActionEvent event) {
+		log.debug("Info File Action started");
+		DumpFile df = dumpFileTable.getSelectionModel().getSelectedItem();
+		
+		try {
+			Map<String, Object> info = df.getInfo();			
+			Map<String,SummaryStatistics> stats = (Map<String, SummaryStatistics>) info.get("DataFrameStats");			
+			Set<String> keys = stats.keySet();
+			ArrayList<String> keyList = new ArrayList<>(keys);			
+			Collections.sort(keyList, new Comparator<String>() {				
+				private boolean isNr(String s) {
+					return s != null && s.matches("[0-9]+");
+				}				
+				@Override
+				public int compare(String o1, String o2) {				
+					if (isNr(o1) && isNr(o2)){
+						return Integer.valueOf(o1).compareTo(Integer.valueOf(o2));
+					} else {
+						return o1.compareTo(o2);
+					}					
+				}
+			});
+			
+			
+			DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT );
+			StringBuffer f = new StringBuffer("<html>");
+			f.append("<table>");
+			f.append("<tr><td>Min. Date</td><td>").append(dateFormat.format(info.get("MinDate"))).append("</td></tr>");
+			f.append("<tr><td>Max. Date</td><td>").append(dateFormat.format(info.get("MaxDate"))).append("</td></tr>");
+			f.append("<tr><td>Data frames:</td><td>").append(info.get("DataFrameCount").toString()).append("</td></tr>");
+			f.append("<tr><td>Channels:</td><td>").append(String.valueOf(stats.size())).append("</td></tr>");
+			
+			f.append("<tr><td>Corrupt frames:</td><td>").append(info.get("CorruptFrameCount").toString()).append("</td></tr>");
+			f.append("<tr><td>Binary frames:</td><td>").append(info.get("BinaryFrameCount").toString()).append("</td></tr>");
+			f.append("<tr><td>Error messages:</td><td>").append(info.get("ErrorMessageCount").toString()).append("</td></tr>");
+			f.append("<tr><td>Messages:</td><td>").append(info.get("MessageCount").toString()).append("</td></tr>");			
+			
+			
+			
+			f.append("</table>");
+			
+			
+						
+			f.append("<table><thead><tr><th>Channel</th><th>Counts</th><th>Min</th><th>Max</th><th>Mean</th><th>Std.Deviation</th>");
+			f.append("</tr></thead>");										
+			f.append("<tbody>");
+			
+			for(String key:keyList) {
+				f.append("<tr>");
+				f.append("<td>").append(key).append("</td>");
+				f.append("<td>").append(stats.get(key).getN()).append("</td>");
+				f.append("<td>").append(String.format("%.3f",stats.get(key).getMin())).append("</td>");
+				f.append("<td>").append(String.format("%.3f",stats.get(key).getMax())).append("</td>");
+				f.append("<td>").append(String.format("%.3f",stats.get(key).getMean())).append("</td>");
+				f.append("<td>").append(String.format("%.3f",stats.get(key).getStandardDeviation())).append("</td>");
+				f.append("</tr>");
+					
+			}
+						
+			f.append("</tbody>");
+		    f.append("</table>");			
+			f.append("</html>");
+			 
+			Alert a = new Alert(AlertType.INFORMATION);
+			a.setTitle("Properties of " + df.getAbsolutePath()) ;			
+			a.setHeaderText("");			
+			WebView webView = new WebView();
+			webView.getEngine().loadContent(f.toString());
+            
+			a.getDialogPane().setContent(webView);;									
+			a.show();
+			
+			
+		} catch (IOException e) {			
+			log.error(e);
+			Dialogs.showErrorDialog(parentStage, "Info creation failed.");			
+		
+		}
+		
+	}
 
 	@FXML
 	public void importFileAction(ActionEvent event) {		
-		InputStream in = null;
-		Board board = null;
+		
 		try {
 			fileChooser.getExtensionFilters().clear();
-			fileChooser.getExtensionFilters().add(filterBayEOS);
-			
+			fileChooser.getExtensionFilters().add(filterBayEOS);			
 			File file = fileChooser.showOpenDialog(parentStage);
 			if (file != null) {
-				String name = Dialogs.showInputDialog(parentStage,"Please specify the board name:", null);
-				if (name != null && (!name.isEmpty())) {
-					board = new Board(name);
-					board.Id = DAO.getBoardDAO().add(board);
-					in = new BufferedInputStream(new FileInputStream(file));					
-					List<String> frameBuffer = new ArrayList<String>(1000);					
-					BulkReader frameReader = new BulkReader(in);								
-					int frameCount = 0;
-					byte[] data;
-					while ((data = frameReader.readData()) != null) {
-						frameBuffer.add(Base64.encodeBase64String(data));
-						frameCount++;
-						if (frameBuffer.size()%1000 == 0){
-							DAO.getFrameDAO().addFrames(frameBuffer, board.Id);
-							frameBuffer.clear();
-						}	
-					}				
-					if (frameBuffer.size() > 0){
-						DAO.getFrameDAO().addFrames(frameBuffer, board.Id);
-						frameBuffer.clear();
-					}
-					
-					
-					board.End = frameReader.getMaxStart();
-					board.Start = frameReader.getMinStart();
-					board.Records = frameCount;
-					DAO.getBoardDAO().update(board);
-					boardList.add(board);
-
+				String origin = Dialogs.showInputDialog(parentStage,"Please specify the board origin:", null);
+								
+				if (origin != null && (!origin.isEmpty())) {				
+					DumpFile dest = new DumpFile(dumpFileDir.getAbsolutePath(),origin);										 
+					Files.copy(file.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);															
+					dumpFileList.add(dest);										
 				}
 			}
 
 		} catch (Exception e) {
 			log.error(e);
-			Dialogs.showErrorDialog(parentStage, "Import failed.");
-			if (board.Id != 0) {
-				try {
-					DAO.getBoardDAO().deleteBoard(board);
-				} catch (SQLException e1) {
-					log.error(e);
-				}
-			}
-		} finally {
-			try {
-				if (in != null)
-					in.close();
-			} catch (IOException e) {
-				log.error(e);
-			}
-
-		}
-
+			Dialogs.showErrorDialog(parentStage, "Import failed.");			
+		} 
 	}
 
 	@FXML
 	public void exportFileAction(ActionEvent event) {		
 		log.debug("Export File Action started");
-		Board b = boardTable.getSelectionModel().getSelectedItem();		
+		DumpFile df = dumpFileTable.getSelectionModel().getSelectedItem();		
 		fileChooser.getExtensionFilters().clear();
 		fileChooser.getExtensionFilters().add(filterExcel);
-		fileChooser.getExtensionFilters().add(filterCSV);
-
-		// fileChooser.setInitialFileName(); since java 1.7.0.45
-		fileChooser.setInitialFileName(b.getName() + ".xlsx");
+		fileChooser.getExtensionFilters().add(filterCSV);		
+		fileChooser.setInitialFileName(df.getName() + ".xlsx");
 		fileChooser.setSelectedExtensionFilter(filterExcel);
 		
-
-		
-		File file = fileChooser.showSaveDialog(parentStage);		
-		
-		
-		String path;
+		File file = fileChooser.showSaveDialog(parentStage);						
 		SeriesFile sFile;
 		
 		if (file != null) {
@@ -1039,8 +1081,8 @@ public class MainController {
 					Dialogs.showErrorDialog(parentStage, "Failed to open file.");
 					return;
 				}				
-				taskDialog.showDialog(parentStage, new ExportFileTask(DAO.getConnection(),b,sFile));
-			} catch (IOException | SQLException e) {
+				taskDialog.showDialog(parentStage, new ExportFileTask(df, sFile));
+			} catch (IOException e) {
 				Dialogs.showErrorDialog(parentStage, "Failed to export data to " + file.getAbsolutePath());
 			} finally {
 				sFile.close();
@@ -1051,32 +1093,20 @@ public class MainController {
 	@FXML
 	public void downloadStartAction(ActionEvent event) {
 		log.debug("Download start action");
-		Board b = null;
-		Task<Board> task;
-		try {
+		
+		try {			
 			byte mode = dataModeChooser.showDialog(parentStage);
-			if (mode == -1) return;			
-			if (logVersion.get() >= 1.2) {
-				task = new DownloadBulkTask(logger, mode);
-			} else {
-				task = new DownloadFrameTask(logger, mode);
-			}
+			if (mode == -1) return;						
+			DownloadBulkTask task = new DownloadBulkTask(logger, mode);
 			taskDialog.showDialog(parentStage, task);
 			try {
-				b = task.get();				
-				if (b!=null && b.getRecords()>0){
-					boardList.add(b);
-					tabPane.getSelectionModel().select(tabDumps);
-				}
-				
+				dumpFileList.add(task.get());
+				tabPane.getSelectionModel().select(tabDumps);
 			} catch (CancellationException| InterruptedException | ExecutionException e) {				
-				log.warn("Download of board cancelled.");	
+				log.warn("Download cancelled.");	
 				return;
 			}
 				
-			
-			
-						
 		} catch (IOException e) {
 			Dialogs.showErrorDialog(parentStage, "Failed to download data.");				
 			return;

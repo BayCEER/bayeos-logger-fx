@@ -1,19 +1,17 @@
 package bayeos.logger;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.TimeZone;
 import java.util.prefs.Preferences;
+
+import org.apache.log4j.Logger;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Dialogs;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
-import org.apache.log4j.Logger;
 
 
 public class MainApp extends Application {
@@ -41,19 +39,7 @@ public class MainApp extends Application {
         log.debug("Loading main pane");
         FXMLLoader loader = new FXMLLoader();        
         Parent rootNode = (Parent) loader.load(getClass().getResourceAsStream(fxmlFile));        
-        MainController c = (MainController)loader.getController();
-        try {
-        	c.initDBStore();
-        } catch (SQLException e) {
-			if (e.getSQLState().equalsIgnoreCase("XJ040")) {
-				Dialogs.showInformationDialog(stage, "Can't start the application twice.");
-				return;
-			} else {
-				log.error(e.getMessage());
-			}
-        }
-        
-               			
+        MainController c = (MainController)loader.getController();      		
         c.setStage(stage);        
         Scene scene = new Scene(rootNode, 600, 400);
         Image ico = new Image("/images/package_green.png");
@@ -61,8 +47,5 @@ public class MainApp extends Application {
         stage.setTitle("BayLogger Utility");        
         stage.setScene(scene);
         stage.show();
-                     
-        
-		
 	}
 }

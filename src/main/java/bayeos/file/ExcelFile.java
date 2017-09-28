@@ -12,6 +12,7 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,7 +25,7 @@ public class ExcelFile implements SeriesFile {
 	private String path;
 	private Sheet sh;
 	private CellStyle cs;
-	private Workbook wb;
+	private SXSSFWorkbook wb;
 	private FileOutputStream out;
 	
 	private Calendar d = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+1"));	
@@ -42,7 +43,7 @@ public class ExcelFile implements SeriesFile {
 		sh = wb.createSheet("Data");		
 		DataFormat df = wb.createDataFormat();		
 		cs = wb.createCellStyle();	
-		cs.setDataFormat(df.getFormat("mm/dd/yyyy hh:mm:ss"));
+		cs.setDataFormat(df.getFormat("dd/mm/yyyy hh:mm:ss"));
 		rowNum = 0;
 		return true;
 	}
@@ -50,9 +51,9 @@ public class ExcelFile implements SeriesFile {
 	@Override
 	public boolean close() {
 		try {
-			wb.write(out);
-			((SXSSFWorkbook) wb).dispose();
+			wb.write(out);			
 			out.close();
+			wb.dispose();
 		} catch (IOException e) {
 			log.error(e.getMessage());
 			return false;
@@ -62,17 +63,15 @@ public class ExcelFile implements SeriesFile {
 
 	@Override
 	public boolean writeRow(Date ts, Map<Integer, Float> values) {
-		Row row = sh.createRow(rowNum);
+		Row row = sh.createRow(rowNum++);
 		Cell cell = row.createCell(0);												
 		d.setTimeInMillis(ts.getTime());
 		cell.setCellValue(d.getTime());
-		cell.setCellStyle(cs);		
-						
-		for (Integer cha : values.keySet()) {
-			cell = row.createCell(cha);
-			cell.setCellValue(values.get(cha));
-		}
-		rowNum++;
+		cell.setCellStyle(cs);	
+		for (Map.Entry<Integer, Float> entry : values.entrySet()) {			
+			Cell c = row.createCell(entry.getKey(),CellType.NUMERIC);
+			c.setCellValue(entry.getValue().doubleValue());
+		}												
 		return true;
 	}
 

@@ -123,13 +123,12 @@
           <content>
             <BorderPane prefHeight="200.0" prefWidth="200.0">
               <center>
-                <TableView fx:id="boardTable" focusTraversable="false" BorderPane.alignment="CENTER">
+                <TableView fx:id="dumpFileTable" focusTraversable="false" BorderPane.alignment="CENTER">
                   <columns>
-                    <TableColumn prefWidth="150.0" text="Name" fx:id="colBoardName" />
-                    <TableColumn prefWidth="150.0" text="Start" fx:id="colBoardStart" />
-                    <TableColumn prefWidth="150.0" text="End" fx:id="colBoardEnd" />
-                    <TableColumn prefWidth="150.0" text="Records" fx:id="colBoardRecords" />
-                    <TableColumn editable="false" minWidth="0.0" prefWidth="0.0" resizable="false" sortable="false" text="Id" visible="false" fx:id="colBoardId" />
+                    <TableColumn prefWidth="200" text="Name" fx:id="coOrigin" />
+                    <TableColumn prefWidth="200" text="Last Modified" fx:id="coLastModified" />
+                    <TableColumn prefWidth="200" text="Size" fx:id="coLength" />                    
+                    <TableColumn editable="false" minWidth="0.0" prefWidth="0.0" resizable="false" sortable="false" text="File Path" visible="false" fx:id="coPath" />
                   </columns>
                 </TableView>
               </center>
@@ -165,6 +164,15 @@
                     	</ImageView>
                 	</graphic>
                     </Button>
+                    
+                    <Button fx:id="btnInfoFile" mnemonicParsing="false" onAction="#infoFileAction">
+                     <graphic>
+                    	<ImageView>
+                        	<Image url="images/dump_info.png"/>
+                    	</ImageView>
+                	</graphic>
+                    </Button>
+                    
                   </items>
                 </ToolBar>
               </top>
