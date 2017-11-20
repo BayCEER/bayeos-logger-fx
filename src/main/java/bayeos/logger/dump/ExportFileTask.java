@@ -1,12 +1,12 @@
 package bayeos.logger.dump;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import bayeos.file.SeriesFile;
+
+import bayeos.file.FrameFile;
 import bayeos.frame.Parser;
 import bayeos.logger.BulkReader;
 import bayeos.logger.TaskController;
@@ -15,12 +15,12 @@ import javafx.concurrent.Task;
 public class ExportFileTask extends Task<Boolean> {
 
 	private DumpFile sFile;
-	private SeriesFile dFile;
+	private FrameFile dFile;
 	private static final Logger log = Logger.getLogger(ExportFileTask.class);
 
-	public ExportFileTask(DumpFile source, SeriesFile destination) {
+	public ExportFileTask(DumpFile source, FrameFile destination) {
 		this.sFile = source;
-		this.dFile = destination;		
+		this.dFile = destination;
 	}
 
 	@Override
@@ -32,50 +32,47 @@ public class ExportFileTask extends Task<Boolean> {
 		int rowNum = 0;
 
 		updateProgress(0, sFile.length());
-		updateMessage(TaskController.getUpdateMsg("Export:", 0,	sFile.length(), startTime));
-		
+		updateMessage(TaskController.getUpdateMsg("Export:", 0, sFile.length(), startTime));
 
-		try (FileInputStream in = new FileInputStream(sFile)){
-			BulkReader reader = new BulkReader(in);
-			byte[] data = null;	
-			long bytes = 0;
-			while ( (data = reader.readData()) != null) {
-				bytes += data.length;
-				if (isCancelled()) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException interrupted) {
-						if (isCancelled()) {
-							updateMessage("Cancelled");
+		try {
+			dFile.open();
+			try (FileInputStream in = new FileInputStream(sFile)) {
+				BulkReader reader = new BulkReader(in);
+				byte[] data = null;
+				long bytes = 0;
+				while ((data = reader.readData()) != null) {
+					bytes += data.length;
+					if (isCancelled()) {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException interrupted) {
+							if (isCancelled()) {
+								updateMessage("Cancelled");
+							}
 						}
+						return false;
 					}
-					return false;
+
+					try {
+						dFile.writeFrame(Parser.parse(data, new Date(), sFile.getOrigin(), null));
+					} catch (IOException e) {
+						log.error("Failed to write values:" + e.getMessage());
+						return false;
+					}
+					if (rowNum++ % 100 == 0) {
+						updateProgress(bytes, sFile.length());
+					}
 				}
-															
-				Map<String,Object> ret = Parser.parse(data);								
-				Map<String, Float> rowValues = (Map<String, Float>) ret.get("value");				
-				Map<Integer,Float> row = new HashMap<>();
-				for(Map.Entry<String, Float> e: rowValues.entrySet()) {
-					row.put(Integer.valueOf(e.getKey()), e.getValue());
-				}
-								
-				
-				Date resTime = new Date(((long)(ret.get("ts"))/(1000*1000)));												
-				if (resTime != null){
-					if (!dFile.writeRow(resTime, row)){
-						log.error("Failed to write values:" + row);
-						return false;						
-					}					
-				}				
-																
-				if (rowNum++ % 100 == 0) {					
-					updateProgress(bytes,sFile.length());
-				}
+				updateProgress(bytes, sFile.length());
+				return true;
 			}
-			updateProgress(bytes,sFile.length());
-			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return false;
+		} finally {
+			dFile.close();
 		}
-		
-	} 
+
+	}
 
 }

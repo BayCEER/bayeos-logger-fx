@@ -39,6 +39,7 @@ public class PrefController {
 	@FXML private Button btnCancel; 
     @FXML private CheckBox chkDeleteDump;
     @FXML private CheckBox chkTimeShift;
+    @FXML private CheckBox chkBattery;
     @FXML private Button okButton;
     @FXML private TableView<ConnectionFX> conTable;
     @FXML private TableColumn colConName;
@@ -49,6 +50,7 @@ public class PrefController {
     @FXML private Button btnEditConnection;
     @FXML private Button btnCheckConnection;
     @FXML private Slider sldTimeShift;
+    
        
     
     private Stage stage;
@@ -59,8 +61,8 @@ public class PrefController {
     
     private SimpleBooleanProperty autoDetect = new SimpleBooleanProperty();
     private SimpleBooleanProperty checkTimeShift = new SimpleBooleanProperty();
-    private SimpleDoubleProperty timeShiftSecs = new SimpleDoubleProperty();
-    
+    private SimpleBooleanProperty checkBattery = new SimpleBooleanProperty();
+    private SimpleDoubleProperty timeShiftSecs = new SimpleDoubleProperty();    
     private SimpleBooleanProperty checkDeleteDump = new SimpleBooleanProperty();    
     
     
@@ -77,6 +79,10 @@ public class PrefController {
     	
     	chkTimeShift.selectedProperty().bindBidirectional(checkTimeShift);
     	checkTimeShift.set(pref.getBoolean("checkTimeShift", true));
+    	
+    	chkBattery.selectedProperty().bindBidirectional(checkBattery);
+    	checkBattery.set(pref.getBoolean("checkBattery", true));
+    	
     	
     	sldTimeShift.disableProperty().bind(Bindings.not(chkTimeShift.selectedProperty()));
     	sldTimeShift.valueProperty().bindBidirectional(timeShiftSecs);
@@ -190,6 +196,7 @@ public class PrefController {
     	// StartUp
     	pref.putBoolean("autoDetect",autoDetect.get());
     	pref.putBoolean("checkTimeShift", checkTimeShift.get());
+    	pref.putBoolean("checkBattery", checkBattery.get());
     	pref.putDouble("timeShiftSecs", timeShiftSecs.get());
 
     	// Upload     	

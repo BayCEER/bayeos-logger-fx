@@ -7,7 +7,7 @@
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-logger-fx</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0.0</version>	
+	<version>2.0.4</version>	
 	<description>Application to communicate with a BayEOS Logger over serial line.</description>
 	
 	<parent>
@@ -148,32 +148,21 @@
 	</build>
 
 	<dependencies>				
-
-		<!-- <dependency>
-			<groupId>com.neuronrobotics</groupId>
-			<artifactId>nrjavaserial</artifactId>
-			<version>3.12.1</version>
-		</dependency> -->
-			<dependency>
-  		<groupId>org.scream3r</groupId>
-  		<artifactId>jssc</artifactId>
-  		<version>2.8.0</version>
+		<dependency>
+  			<groupId>org.scream3r</groupId>
+	  		<artifactId>jssc</artifactId>
+  			<version>2.8.0</version>
   		</dependency>
- 
-		
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-password-file</artifactId>
 			<version>1.0.0</version>
-		</dependency>
-		
+		</dependency>		
 		<dependency>
 			<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 			<artifactId>bayeos-logger</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		
-		
+			<version>2.3</version>
+		</dependency>				
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -194,6 +183,12 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.17</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>org.apache.xmlbeans</groupId>
+    		<artifactId>xmlbeans</artifactId>
+    		<version>2.5.0</version>
 		</dependency>
 		
 	</dependencies>

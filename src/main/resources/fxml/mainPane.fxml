@@ -1,229 +1,260 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane id="mainPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml" fx:controller="bayeos.logger.MainController">
-  <bottom>
-    <AnchorPane minHeight="31.0" prefHeight="31.0" prefWidth="600.0">
-      <children>
-        <Label fx:id="lblConnection" alignment="TOP_RIGHT" contentDisplay="TOP" layoutY="5.0" prefHeight="22.0" prefWidth="207.0" AnchorPane.rightAnchor="10.0" />
-      </children>
-    </AnchorPane>
-  </bottom>
-  <center>
-    <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
-      <tabs>
-        <Tab fx:id="tabLogger" text="Logger">
-          <content>
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
-              <center>
-                <GridPane fx:id="frmLogger" alignment="TOP_CENTER" hgap="10.0" vgap="10.0" BorderPane.alignment="TOP_CENTER">
-                  <children>
-                  	<Label id="txtName" fx:id="txtLoggerVersion" GridPane.columnIndex="1" GridPane.rowIndex="0" />                  	                    
-                    <Label fx:id="txtLoggerName"  GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                    <Label fx:id="txtLoggerSampleInterval" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <Label GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                    <Label text="Estimated New Frames:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                    <Label text="Name *:" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                      <font>
-                        <Font name="System Bold" size="12.0" fx:id="x1" />
-                      </font>
-                    </Label>
-                    <Label text="Version:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                    <Label text="Date of Next Frame:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                    <Label font="$x1" text="Sampling Interval [sec] *:" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                      <textFill>
-                        <Color blue="0.161" green="0.161" red="0.161" fx:id="x2" />
-                      </textFill>
-                    </Label>
-                    <Label font="$x1" text="Current Date *:" textFill="$x2" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                    <Label fx:id="txtLoggerCurrentDate" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                    <Label fx:id="txtLoggerNextFrame"  GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                    <Label fx:id="txtLoggerNewFrameCount" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                    <Button fx:id="btnSetName" mnemonicParsing="false" onAction="#setNameAction" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                    <Button fx:id="btnSetSamplingInterval" mnemonicParsing="false" onAction="#setSamplingIntervalAction" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                    <Button fx:id="btnSetDate" mnemonicParsing="false" onAction="#setCurrentDateAction" text="Sync" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                  </children>
-                  <columnConstraints>
-                    <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
-                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="50.0" />
-                  </columnConstraints>
-                  <padding>
-                    <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
-                  </padding>
-                  <rowConstraints>
-                    <RowConstraints fillHeight="false" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
-                    <RowConstraints fillHeight="false" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
-                    <RowConstraints fillHeight="false" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
-                    <RowConstraints fillHeight="false" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
-                    <RowConstraints fillHeight="false" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
-                    <RowConstraints fillHeight="false" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
-                  </rowConstraints>
-                </GridPane>
-              </center>
-              <top>
-                <ToolBar>
-                  <items>
-                    <StackPane>
-                      <children>
-                        <Button fx:id="btnConnect" defaultButton="true" mnemonicParsing="false" onAction="#connectSerialAction">
-                        <graphic>
-                    	<ImageView>
-                        	<Image url="images/connect.png"/>
-                    	</ImageView>
-                		</graphic>
-                        </Button>
-                        <Button fx:id="btnDisconnect" defaultButton="true" mnemonicParsing="false" onAction="#disconnectSerialAction" visible="false">
-                        <graphic>
-                    	<ImageView>
-                        	<Image url="images/disconnect.png"/>
-                    	</ImageView>
-                		</graphic>
-                	</Button>
-                      </children>
-                    </StackPane>
-                    <Button fx:id="btnDownload" mnemonicParsing="false" onAction="#downloadStartAction">  
-                    <graphic>                  	
-                    	<ImageView>
-                        	<Image url="images/dump_data.png"/>
-                    	</ImageView>
-                	</graphic> 
-                </Button>
-                    <Button fx:id="btnDownloadFile" mnemonicParsing="false" onAction="#downloadFileAction" >
-                    <graphic>
-                    	<ImageView>
-                        	<Image url="images/dump_file.png"/>
-                    	</ImageView>
-                	</graphic>
-                	</Button>
-                    <Button fx:id="btnReset" mnemonicParsing="false" onAction="#resetDataAction">
-                    	<graphic>
-                    	<ImageView>
-                        	<Image url="images/dump_delete.png"/>
-                    	</ImageView>
-                	</graphic>
-                    </Button>
-                  </items>
-                </ToolBar>
-              </top>
-            </BorderPane>
-          </content>
-        </Tab>
-        <Tab fx:id="tabDumps" text="Dumps">
-          <content>
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
-              <center>
-                <TableView fx:id="dumpFileTable" focusTraversable="false" BorderPane.alignment="CENTER">
-                  <columns>
-                    <TableColumn prefWidth="200" text="Name" fx:id="coOrigin" />
-                    <TableColumn prefWidth="200" text="Last Modified" fx:id="coLastModified" />
-                    <TableColumn prefWidth="200" text="Size" fx:id="coLength" />                    
-                    <TableColumn editable="false" minWidth="0.0" prefWidth="0.0" resizable="false" sortable="false" text="File Path" visible="false" fx:id="coPath" />
-                  </columns>
-                </TableView>
-              </center>
-              <top>
-                <ToolBar>
-                  <items>
-                    <Button fx:id="btnUpload" mnemonicParsing="false" onAction="#uploadStartAction"  >
-                    <graphic>
-                    	<ImageView>
-                        	<Image url="images/dump_upload.png"/>
-                    	</ImageView>
-                	</graphic>
-                    </Button>
-                    <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#deleteDumpAction" >
-                    <graphic>
-                    	<ImageView>
-                        	<Image url="images/cross.png"/>
-                    	</ImageView>
-                	</graphic>
-                    </Button>
-                    <Separator />
-                    <Button fx:id="btnImportFile" mnemonicParsing="false" onAction="#importFileAction" >
-                    <graphic>
-                    	<ImageView>
-                        	<Image url="images/dump_add.png"/>
-                    	</ImageView>
-                	</graphic>
-                	</Button>
-                    <Button fx:id="btnExportFile" mnemonicParsing="false" onAction="#exportFileAction">
-                     <graphic>
-                    	<ImageView>
-                        	<Image url="images/dump_file.png"/>
-                    	</ImageView>
-                	</graphic>
-                    </Button>
-                    
-                    <Button fx:id="btnInfoFile" mnemonicParsing="false" onAction="#infoFileAction">
-                     <graphic>
-                    	<ImageView>
-                        	<Image url="images/dump_info.png"/>
-                    	</ImageView>
-                	</graphic>
-                    </Button>
-                    
-                  </items>
-                </ToolBar>
-              </top>
-            </BorderPane>
-          </content>
-        </Tab>
-        <Tab fx:id="tabLive" text="Live">
-          <content>
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
-              <center>
-                <ScrollPane fitToWidth="true">
-                  <VBox id="vbChart" fx:id="vboxChart" prefHeight="200.0" prefWidth="100.0" />
-                </ScrollPane>
-              </center>
-              <top>
-                <ToolBar>
-                  <items>
-                    <StackPane alignment="CENTER_LEFT" prefWidth="64.0">
-                      <children>
-                        <Button fx:id="btnLiveStart" mnemonicParsing="false" onAction="#liveStartAction" text="Start" />
-                        <Button fx:id="btnLiveStop" defaultButton="true" mnemonicParsing="false" onAction="#liveStopAction" prefWidth="100.0" text="Stop" visible="false" />
-                      </children>
-                    </StackPane>
-                  </items>
-                </ToolBar>
-              </top>
-            </BorderPane>
-          </content>
-        </Tab>
-      </tabs>
-    </TabPane>
-  </center>
-  <top>
-    <VBox prefWidth="600.0">
-      <children>
-        <MenuBar>
-          <menus>
-            <Menu mnemonicParsing="false" text="File">
-              <items>
-                <MenuItem mnemonicParsing="false" onAction="#showPreferences" text="Preferences" fx:id="mnuPref" />
-                <MenuItem mnemonicParsing="false" onAction="#closeApplication" text="Close" fx:id="mnuClose" />
-              </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Help">
-              <items>
-                <MenuItem mnemonicParsing="false" onAction="#showAboutDialog" text="About" />
-              </items>
-            </Menu>
-          </menus>
-        </MenuBar>
-      </children>
-    </VBox>
-  </top>
+<BorderPane id="mainPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bayeos.logger.MainController">
+	<bottom>
+		<AnchorPane minHeight="31.0" prefHeight="31.0" prefWidth="600.0">
+			<children>
+				<Label fx:id="lblConnection" alignment="TOP_RIGHT" contentDisplay="TOP" layoutY="5.0" prefHeight="22.0" prefWidth="207.0" AnchorPane.rightAnchor="10.0" />
+			</children>
+		</AnchorPane>
+	</bottom>
+	<center>
+		<TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+			<tabs>
+				<Tab fx:id="tabLogger" text="Logger">
+					<content>
+						<BorderPane prefHeight="200.0" prefWidth="200.0">
+							<center>
+							  	<VBox>
+								<GridPane fx:id="grdLogger" hgap="2.0" vgap="2.0">
+									<columnConstraints>
+										<ColumnConstraints hgrow="SOMETIMES" maxWidth="279.0" minWidth="10.0" prefWidth="174.0" />
+										<ColumnConstraints hgrow="SOMETIMES" maxWidth="395.0" minWidth="10.0" prefWidth="394.0" />
+									</columnConstraints>
+
+									<children>
+										<Label fx:id="lblLoggerVersion" text="Version:" />
+										<Label fx:id="txtLoggerVersion" text="Not available" GridPane.columnIndex="1" />
+										<Label fx:id="lblLoggerName" text="Name:" GridPane.rowIndex="1">
+											<font>
+												<Font name="System Bold" size="12.0" />
+											</font>
+										</Label>
+										<TextField fx:id="txtLoggerName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+										<TextField fx:id="txtLoggerInterval" GridPane.columnIndex="1" GridPane.rowIndex="2" />										
+										<Label fx:id="lblLoggerInterval" text="Sampling Interval [sec]*" GridPane.rowIndex="2">
+											<font>
+												<Font name="System Bold" size="12.0" />
+											</font>
+										</Label>
+										<Label fx:id="lblLoggerTime" text="Current Time:" GridPane.rowIndex="3">
+											<font>
+												<Font name="System Bold" size="12.0" />
+											</font>
+										</Label>
+										<Label fx:id="lblNextTime" text="Time of Next Data Record:" GridPane.rowIndex="4" />
+										<Label fx:id="lblNewRecords" text="Estimated New Data Records:" GridPane.hgrow="NEVER" GridPane.rowIndex="5" />
+										<Label fx:id="lblBatteryStatus" text="Battery Status:" GridPane.rowIndex="6" />
+										<Label fx:id="txtLoggerNextTime" text="unknown" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+										<Label fx:id="txtLoggerNewRecords" text="unknown" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+										<Label fx:id="txtLoggerBatteryStatus" text="unknown" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+										<HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="3">
+											<children>
+												<Label fx:id="txtLoggerCurrentTime" text="unknown" />
+												<Button fx:id="btnSetTime" mnemonicParsing="false" text="Sync">
+													<HBox.margin>
+														<Insets left="10.0" />
+													</HBox.margin>
+												</Button>
+											</children>
+										</HBox>
+									</children>
+									<padding>
+										<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+									</padding>
+									<rowConstraints>
+										<RowConstraints prefHeight="30" />
+										<RowConstraints />
+										<RowConstraints />
+										<RowConstraints />
+										<RowConstraints prefHeight="30" />
+										<RowConstraints prefHeight="30" />
+										<RowConstraints prefHeight="30" />
+									</rowConstraints>
+                              <VBox.margin>
+                                 <Insets left="10.0" right="10.0" />
+                              </VBox.margin>
+								</GridPane>								
+    							</VBox>
+							</center>
+							<top>
+								<ToolBar>
+									<items>
+										<StackPane>
+											<children>
+												<Button fx:id="btnConnect" mnemonicParsing="false" onAction="#connectSerialAction">
+													<graphic>
+														<ImageView>
+															<image>
+																<Image url="images/connect.png" />
+															</image>
+														</ImageView>
+													</graphic>
+												</Button>
+												<Button fx:id="btnDisconnect" mnemonicParsing="false" onAction="#disconnectSerialAction" visible="false">
+													<graphic>
+														<ImageView>
+															<Image url="images/disconnect.png" />
+														</ImageView>
+													</graphic>
+												</Button>
+											</children>
+										</StackPane>
+										<Button fx:id="btnDownload" mnemonicParsing="false" onAction="#downloadStartAction">
+											<graphic>
+												<ImageView>
+													<Image url="images/dump_data.png" />
+												</ImageView>
+											</graphic>
+										</Button>
+										<Button fx:id="btnDownloadFile" mnemonicParsing="false" onAction="#downloadFileAction">
+											<graphic>
+												<ImageView>
+													<Image url="images/dump_file.png" />
+												</ImageView>
+											</graphic>
+										</Button>
+										<Button fx:id="btnReset" mnemonicParsing="false" onAction="#resetDataAction">
+											<graphic>
+												<ImageView>
+													<Image url="images/dump_delete.png" />
+												</ImageView>
+											</graphic>
+										</Button>
+									</items>
+								</ToolBar>
+							</top>
+						</BorderPane>
+					</content>
+				</Tab>
+				<Tab fx:id="tabDumps" text="Dumps">
+					<content>
+						<BorderPane prefHeight="200.0" prefWidth="200.0">
+							<center>
+								<TableView fx:id="dumpFileTable" focusTraversable="false" BorderPane.alignment="CENTER">
+									<columns>
+										<TableColumn fx:id="coOrigin" prefWidth="200" text="Name" />
+										<TableColumn fx:id="coLastModified" prefWidth="200" text="Last Modified" />
+										<TableColumn fx:id="coLength" prefWidth="200" text="Size" />
+										<TableColumn fx:id="coPath" editable="false" minWidth="0.0" prefWidth="0.0" resizable="false" sortable="false" text="File Path" visible="false" />
+									</columns>
+								</TableView>
+							</center>
+							<top>
+								<ToolBar>
+									<items>
+										<Button fx:id="btnUpload" mnemonicParsing="false" onAction="#uploadStartAction">
+											<graphic>
+												<ImageView>
+													<Image url="images/dump_upload.png" />
+												</ImageView>
+											</graphic>
+										</Button>
+										<Button fx:id="btnDelete" mnemonicParsing="false" onAction="#deleteDumpAction">
+											<graphic>
+												<ImageView>
+													<Image url="images/cross.png" />
+												</ImageView>
+											</graphic>
+										</Button>
+										<Separator />
+										<Button fx:id="btnImportFile" mnemonicParsing="false" onAction="#importFileAction">
+											<graphic>
+												<ImageView>
+													<Image url="images/dump_add.png" />
+												</ImageView>
+											</graphic>
+										</Button>
+										<Button fx:id="btnExportFile" mnemonicParsing="false" onAction="#exportFileAction">
+											<graphic>
+												<ImageView>
+													<Image url="images/dump_file.png" />
+												</ImageView>
+											</graphic>
+										</Button>
+
+										<Button fx:id="btnInfoFile" mnemonicParsing="false" onAction="#infoFileAction">
+											<graphic>
+												<ImageView>
+													<Image url="images/dump_info.png" />
+												</ImageView>
+											</graphic>
+										</Button>
+
+									</items>
+								</ToolBar>
+							</top>
+						</BorderPane>
+					</content>
+				</Tab>
+				<Tab fx:id="tabLive" text="Live">
+					<content>
+						<BorderPane prefHeight="200.0" prefWidth="200.0">
+							<center>
+								<TabPane fx:id="tabCharts" />
+							</center>
+							<top>
+								<ToolBar>
+									<items>
+										<StackPane alignment="CENTER_LEFT" prefWidth="64.0">
+											<children>
+												<Button fx:id="btnLiveStart" mnemonicParsing="false" onAction="#liveStartAction" text="Start" />
+												<Button fx:id="btnLiveStop" defaultButton="true" mnemonicParsing="false" onAction="#liveStopAction" prefWidth="100.0" text="Stop" visible="false" />
+											</children>
+										</StackPane>
+									</items>
+								</ToolBar>
+							</top>
+						</BorderPane>
+					</content>
+				</Tab>
+			</tabs>
+		</TabPane>
+	</center>
+	<top>
+		<VBox prefWidth="600.0">
+			<children>
+				<MenuBar>
+					<menus>
+						<Menu mnemonicParsing="false" text="File">
+							<items>
+								<MenuItem fx:id="mnuPref" mnemonicParsing="false" onAction="#showPreferences" text="Preferences" />
+								<MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#closeApplication" text="Close" />
+							</items>
+						</Menu>
+						<Menu mnemonicParsing="false" text="Help">
+							<items>
+								<MenuItem mnemonicParsing="false" onAction="#showAboutDialog" text="About" />
+							</items>
+						</Menu>
+					</menus>
+				</MenuBar>
+			</children>
+		</VBox>
+	</top>
 </BorderPane>

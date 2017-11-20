@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml" fx:controller="bayeos.logger.pref.PrefController">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65" fx:controller="bayeos.logger.pref.PrefController">
   <bottom>
     <HBox alignment="CENTER_RIGHT" prefHeight="52.0" prefWidth="600.0" spacing="10.0" BorderPane.alignment="CENTER_RIGHT">
       <children>
@@ -28,6 +37,7 @@
                 <Label layoutX="60.0" layoutY="95.0" text="Max Time Shift [seconds]:" />
                 <CheckBox fx:id="chkTimeShift" layoutX="30.0" layoutY="67.0" mnemonicParsing="false" text="Warn me if logger clock has time shift" />
                 <Slider fx:id="sldTimeShift" layoutX="60.0" layoutY="122.0" majorTickUnit="10.0" max="120.0" minorTickCount="4" prefHeight="21.0" prefWidth="300.0" showTickLabels="true" showTickMarks="true" />
+                <CheckBox fx:id="chkBattery" layoutX="30.0" layoutY="168.0" mnemonicParsing="false" text="Warn me if battery is low" />
               </children>
             </AnchorPane>
           </content>
@@ -41,9 +51,9 @@
                   <center>
                     <TableView id="tblViewConnection" fx:id="conTable" editable="true" prefHeight="169.0" prefWidth="550.0">
                       <columns>
-                        <TableColumn minWidth="120.0" prefWidth="120.0" text="Name" fx:id="colConName" />
-                        <TableColumn prefWidth="300.0" text="Host" fx:id="colConHost" />
-                        <TableColumn prefWidth="130.0" text="User" fx:id="colConUser" />
+                        <TableColumn fx:id="colConName" minWidth="120.0" prefWidth="120.0" text="Name" />
+                        <TableColumn fx:id="colConHost" prefWidth="300.0" text="Host" />
+                        <TableColumn fx:id="colConUser" prefWidth="130.0" text="User" />
                       </columns>
                     </TableView>
                   </center>
