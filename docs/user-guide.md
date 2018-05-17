@@ -1,4 +1,4 @@
-# BayEOS Logger FX User Guide {ignore=true} 
+# BayEOS Logger FX User Guide
 Released 2018-05-16
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
