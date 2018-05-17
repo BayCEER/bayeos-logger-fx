@@ -35,7 +35,7 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 - PC system clock is synchronized with a NTP time server
 
 ### Windows
-1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/)
+1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/bayeos/bayeos-logger-fx.zip)
 1. Download and install the latest [JRE (version >=8)](http://www.java.com/)
 1. Connect your PC with a logger using a USB cable
 1. Wait until the device driver is installed
@@ -45,7 +45,7 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 1. Open the new link 
 
 ### Linux
-1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/)
+1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/bayeos/bayeos-logger-fx.zip)
 1. Login with root privileges and download the latest [JRE (version >=8)](http://www.java.com/) software
 1. Extract the tar file to the default JRE location e.g. /usr/lib/jvm/jre8
 1. Install the new JRE alternative: 
@@ -61,7 +61,7 @@ Replace ``<username>`` with your personal system user name
 1. Start ``bayeos-logger-fx<version>.jar`` with a mouse click 
 
 ### Mac
-1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/)
+1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/bayeos/bayeos-logger-fx.zip)
 1. Login with root privileges and download the latest [JRE (version >=8)](http://www.java.com/) software
 1. Start ``bayeos-logger-fx<version>.jar`` with a mouse click 
 
