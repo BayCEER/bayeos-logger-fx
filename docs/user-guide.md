@@ -39,7 +39,8 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 1. Download and install the latest [JRE (version >=8)](http://www.java.com/)
 1. Connect your PC with a logger using a USB cable
 1. Wait until the device driver is installed
-1. Open the device manager (right click on start/device manager) and search for a new USB Serial Port. Mark the port number.  ![DeviceManager](DeviceManager.png)
+1. Open the device manager (right click on start/device manager) and search for a new USB Serial Port. Mark the port number.  
+![DeviceManager](DeviceManager.png)
 1. Create a new link to BayEOS-Logger.exe on your desktop
 1. Open the new link 
 
@@ -74,19 +75,20 @@ Replace ``<username>`` with your personal system user name
 ## Main Tasks
 
 ### Data Download
-1. Connect your PC with the logger by using the USB Mini-B cable:
+1. Connect your PC with the logger by using the USB Mini-B cable:  
 ![USB Jack](USBJack.png)
 1. Start the BayEOS Logger FX application by clicking the desktop icon
 1. Press the `Connect` button
-1. Choose the serial port and baudrate (38400) and press `connect`:
+1. Choose the serial port and baudrate (38400) and press `connect`:  
 ![Connect dialog](ConnectDialog.png))
-1. The main window shows the logger meta information
+1. The main window shows the logger meta information  
 ![MainFrameConnected](MainFrameConnected.png)
 1. Press the download button ![Download](DownloadButton.png) 
-1. Choose `New` to download all new records since your last download:
+1. Choose `New` to download all new records since your last download:  
 ![Download new data](DownloadNew.png)
 1. Press the `OK` to start the data download task
-1. The data is downloaded and a new dump record can be found on the dumps tab:![Dump view](DumpView.png)
+1. The data is downloaded and a new dump record can be found on the dumps tab:  
+![Dump view](DumpView.png)
 1. Press `Disconnect` and disconnect the logger cable
 1. You are now ready to upload the data to a BayEOS Gateway
 
@@ -99,7 +101,7 @@ BayEOS gateway can be accessed
 1. The dump record is deleted after a successful upload 
 
 ### Live Mode 
-The live mode allows you to verify the sensor data in situ. It can be activated on an already connected logger by clicking the `Start` button on the live tab. The data is shown as it is received from the BayEOS board. Data logging is not stopped during live mode. Please press the `Stop` button to turn the live mode off.
+The live mode allows you to verify the sensor data in situ. It can be activated on an already connected logger by clicking the `Start` button on the live tab. The data is shown as it is received from the BayEOS board. Data logging is not stopped during live mode. Please press the `Stop` button to turn the live mode off.  
 ![Live Mode](LiveMode.png)
 
 ## Logger Configuration
