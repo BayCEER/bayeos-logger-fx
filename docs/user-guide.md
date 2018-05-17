@@ -39,7 +39,7 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 1. Download and install the latest [JRE (version >=8)](http://www.java.com/)
 1. Connect your PC with a logger using a USB cable
 1. Wait until the device driver is installed
-1. Open the device manager (right click on start/device manager) and search for a new USB Serial Port. Mark the port number. ![DeviceManager](DeviceManager.png)
+1. Open the device manager (right click on start/device manager) and search for a new USB Serial Port. Mark the port number.  ![DeviceManager](DeviceManager.png)
 1. Create a new link to BayEOS-Logger.exe on your desktop
 1. Open the new link 
 
