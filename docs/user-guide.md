@@ -83,7 +83,7 @@ Replace ``<username>`` with your personal system user name
 ![Connect dialog](ConnectDialog.png))
 1. The main window shows the logger meta information  
 ![MainFrameConnected](MainFrameConnected.png)
-1. Press the download button ![Download](DownloadButton.png) 
+1. Press the download button ![Download](UploadButton.png) 
 1. Choose `New` to download all new records since your last download:  
 ![Download new data](DownloadNew.png)
 1. Press the `OK` to start the data download task
