@@ -2,13 +2,9 @@ package bayeos.logger;
 
 import java.util.Date;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.FloatProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class LoggerProperties {

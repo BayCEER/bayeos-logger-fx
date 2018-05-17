@@ -1,7 +1,5 @@
 package bayeos.logger;
 
-import static bayeos.logger.LoggerConstants.SM_RESET;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +57,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Dialogs;
 import javafx.scene.control.Dialogs.DialogOptions;
 import javafx.scene.control.Dialogs.DialogResponse;
@@ -567,14 +564,23 @@ public class MainController {
 			String name = logger.getName();			
 			loggerProperties.setName(name);
 			loggerProperties.setSamplingInterval(String.valueOf(logger.getSamplingInterval()));
-			loggerProperties.setCurrentTime(logger.getTime());									
-			loggerProperties.setNextTime(logger.getDateOfNextFrame());												
-			loggerProperties.setBatteryStatus(logger.getBatteryStatus());
+			
+			Date ctime  = logger.getTime();			
+			loggerProperties.setCurrentTime(ctime);
+			
+			Date next = logger.getDateOfNextFrame();
+			if (next.before(ctime)) {				
+				loggerProperties.setNextTime(next);				
+			} else {
+				loggerProperties.setNextTime(null);
+			}
+																					
+		
 			
 			// Time shift 			
 			if (pref.getBoolean("checkTimeShift", true) && loggerProperties.getCurrentTime() != null) {
 				Date now = new Date();
-				if (Math.abs(logger.getTime().getTime() - now.getTime()) > pref.getDouble("timeShiftSecs", 60) * 1000) {
+				if (Math.abs(ctime.getTime() - now.getTime()) > pref.getDouble("timeShiftSecs", 60) * 1000) {
 					DialogResponse r = Dialogs.showConfirmDialog(parentStage,
 							"Timeshift of logger detected.\nWould you like to synchronize the logger clock with your system clock?",
 							null, "Please confirm", DialogOptions.YES_NO);
@@ -591,15 +597,22 @@ public class MainController {
 				}
 			}
 			
-			// Calculate new Records 
-			if (loggerProperties.getCurrentTime() != null && loggerProperties.getNextTime() != null && loggerProperties.getSamplingInterval() != null) {
-				long d = (loggerProperties.getCurrentTime().getTime() - loggerProperties.getNextTime().getTime()) / (Integer.valueOf(loggerProperties.getSamplingInterval()) * 1000);				
+									
+			// Calculate new Records
+			ctime = loggerProperties.getCurrentTime();
+			next = loggerProperties.getNextTime();
+			String sampling = loggerProperties.getSamplingInterval(); 
+			if (ctime != null && next != null && sampling != null && ctime.after(next)) {							     				
+				long d = (ctime.getTime() - next.getTime()) / (Integer.valueOf(sampling) * 1000) + 1;								
 				loggerProperties.setNewRecords(d);				
-			} 			
+			} else {
+				loggerProperties.setNewRecords(null);
+			}
 			
+			loggerProperties.setBatteryStatus(logger.getBatteryStatus());			
 			// Battery Warning 
-			if (pref.getBoolean("checkBattery", true) && loggerProperties.getBatteryStatus() != null) {
-				if (!logger.getBatteryStatus()) {
+			if (pref.getBoolean("checkBattery", true)) {				
+				if (!loggerProperties.getBatteryStatus()) {
 					Dialogs.showWarningDialog(parentStage, "Logger battery is low.");
 				}
 			}
@@ -736,8 +749,11 @@ public class MainController {
 				DialogOptions.YES_NO);
 		if (res.equals(DialogResponse.YES)) {
 			try {
-				logger.stopData(SM_RESET);
+				logger.sendBufferCommand(LoggerConstants.BC_ERASE);
+				
 				queryMetaDataAction(null);
+				
+				
 			} catch (IOException e) {
 				log.error(e.getMessage());
 				Dialogs.showErrorDialog(parentStage, "Reset of logger data failed.");
