@@ -55,7 +55,7 @@ public class ExcelFile extends AbstractFrameFile {
 	}
 
 	@Override
-	public void writeFrame(Map<String, Object> frame) throws IOException {
+	public void writeDataFrame(Map<String, Object> frame) throws IOException {
 		String origin = (String) frame.get("origin");	
 		String sheetName = Paths.get(origin.replace("/",File.separator)).getFileName().toString();
 		if (!lastOrigin.equals(origin)) {			
@@ -80,13 +80,17 @@ public class ExcelFile extends AbstractFrameFile {
 		addColumnIndex(origin, values);
 		List<String> indexList = getColumnIndexList(origin);
 		int index = 1;
-		for (String nr : indexList) {
-			Number n = values.get(nr);
-			if (n != null) {
-				Cell c = row.createCell(index++, CellType.NUMERIC);
-				c.setCellValue(n.doubleValue());
-			}
+		
+		if (values != null) {
+			for (String nr : indexList) {
+				Number n = values.get(nr);
+				if (n != null) {
+					Cell c = row.createCell(index++, CellType.NUMERIC);
+					c.setCellValue(n.doubleValue());
+				}
+			}	
 		}
+		
 		lastRows.put(origin, lastRow);
 	}
 

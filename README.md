@@ -15,6 +15,9 @@ Please refer to the ![user guide](/docs/user-guide.md) for more information.
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.0.6, July 10, 2018
+- Fixed bug: Save incomplete data frames to file 
+
 ### Version 2.0.5, May 15, 2018
 - WebStart support dropped
 - Fixed bug: Delete logger data 

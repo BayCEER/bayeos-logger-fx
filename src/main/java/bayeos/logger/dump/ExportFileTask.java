@@ -3,9 +3,11 @@ package bayeos.logger.dump;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import bayeos.binary.ByteArray;
 import bayeos.file.FrameFile;
 import bayeos.frame.Parser;
 import bayeos.logger.BulkReader;
@@ -54,7 +56,13 @@ public class ExportFileTask extends Task<Boolean> {
 					}
 
 					try {
-						dFile.writeFrame(Parser.parse(data, new Date(), sFile.getOrigin(), null));
+						Map<String, Object> f = Parser.parse(data, new Date(), sFile.getOrigin(), null);
+						if (f!=null) {
+							dFile.writeFrame(f);	
+						} else {
+							log.warn("Failed to parse frame:" + data);
+						}
+														
 					} catch (IOException e) {
 						log.error("Failed to write values:" + e.getMessage());
 						return false;

@@ -21,6 +21,7 @@ public abstract class AbstractFrameFile implements FrameFile {
 		
 	
 	public void addColumnIndex(String origin, Map<String, Number> values) {
+		if (values == null) return;
 		ArrayList<String> sortList = new ArrayList<String>();		
 		sortList.addAll(values.keySet());		
 		Collections.sort(sortList, new Comparator<String>() {
@@ -62,7 +63,8 @@ public abstract class AbstractFrameFile implements FrameFile {
 	
 	
 	@Override
-	public void writeFrame(Map<String, Object> frame) throws IOException  {															
+	public void writeFrame(Map<String, Object> frame) throws IOException  {			
+		if (frame.containsKey("type")) {
 			switch ((String)frame.get("type")) {
 			case "DataFrame":
 				writeDataFrame(frame);				
@@ -71,8 +73,9 @@ public abstract class AbstractFrameFile implements FrameFile {
 				writeMessage(frame);
 			default:
 				break;
-			}					
-	}
+			}								
+		}
+	} 
 
 	public void writeMessage(Map<String, Object> frame) throws IOException {
 				

@@ -108,13 +108,15 @@ public class ZipFrameFile extends AbstractFrameFile  {
 		fileWriter.write(df.format(ts));				
 		Map<String, Number> values = (Map<String, Number>) frame.get("value");
 		addColumnIndex(origin, values);	
-		for(String e:getColumnIndexList(origin)) {
-			fileWriter.write(SEP);
-			Number n = values.get(e);
-			if (n!=null) {
-				fileWriter.write(n.toString());
-			}
-		}
+		if (values != null) {
+			for(String e:getColumnIndexList(origin)) {
+				fileWriter.write(SEP);
+				Number n = values.get(e);
+				if (n!=null) {
+					fileWriter.write(n.toString());
+				}
+			}	
+		}		
 		fileWriter.write("\n");			
 	}
 
