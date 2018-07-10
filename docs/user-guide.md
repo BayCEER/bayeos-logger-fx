@@ -75,8 +75,7 @@ Replace ``<username>`` with your personal system user name
 ## Main Tasks
 
 ### Data Download
-1. Connect your PC with the logger by using the USB Mini-B cable:  
-![USB Jack](USBJack.png)
+1. Connect your PC with the logger 
 1. Start the BayEOS Logger FX application by clicking the desktop icon
 1. Press the `Connect` button
 1. Choose the serial port and baudrate (38400) and press `connect`:  
@@ -89,7 +88,7 @@ Replace ``<username>`` with your personal system user name
 1. Press the `OK` to start the data download task
 1. The data is downloaded and a new dump record can be found on the dumps tab:  
 ![Dump view](DumpView.png)
-1. Press `Disconnect` and disconnect the logger cable
+1. Press `Disconnect` and disconnect the logger cable or close the Bluetooth connection
 1. You are now ready to upload the data to a BayEOS Gateway
 
 ### Data Upload
@@ -113,7 +112,7 @@ You can configure your logger on the main logger tab to set the logger:
 ## Troubleshooting
 
 ### No serial device found 
-- Verify that your USB Mini-B male connector fits completely into the jack. You need a cable with a small plug.
+- Verify that your USB connector fits completely into the jack
 - Check the [FTDI Driver](http://www.ftdichip.com/FTDrivers.htm) installation
 - Check the logger battery
 
