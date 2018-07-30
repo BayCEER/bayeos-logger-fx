@@ -5,7 +5,7 @@
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-logger-fx</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0.6</version>	
+	<version>2.0.7</version>	
 	<description>Application to communicate with a BayEOS Logger over serial line.</description>
 	
 	<parent>
@@ -51,6 +51,7 @@
 				</configuration>
 			</plugin>
 			
+			<!--  mvn jfx:jar -->
 			<plugin>											
 				<groupId>com.zenjava</groupId>
 				<artifactId>javafx-maven-plugin</artifactId>

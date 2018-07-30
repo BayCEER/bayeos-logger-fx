@@ -1,9 +1,6 @@
 package bayeos.logger;
 
 
-import java.util.Date;
-import java.util.prefs.Preferences;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -21,7 +18,6 @@ import javafx.stage.WindowEvent;
 
 public class TaskController  {
 
-	private Preferences pref = Preferences.userNodeForPackage(MainApp.class);
 	private Stage stage;
 
 	@FXML
@@ -34,6 +30,7 @@ public class TaskController  {
 	private ProgressBar progBar;
 	
 	private Task task;
+		
 		
 	@FXML
 	public void cancelTask(ActionEvent event) {			
@@ -51,19 +48,11 @@ public class TaskController  {
 	}
 	
 	
-	public static String getUpdateMsg(String task, long read, long bytes, long startTime) {
-		int per = Math.round(read / (float) bytes * 100);
-		long millis = Math
-				.round(((new Date().getTime() - startTime) / (float) read)
-						* (bytes - read));
-		int h = (int) ((millis / 1000) / 3600);
-		int m = (int) (((millis / 1000) / 60) % 60);
-		int s = (int) ((millis / 1000) % 60);
-		return String.format("%s: %d%% read (%02d:%02d:%02d remaining)",task, per, h, m, s);
-	}
+	
 
 	public void startTask(Task task) {
 		this.task = task;
+		
 		progBar.progressProperty().bind(task.progressProperty());
 		lblProgress.textProperty().bind(task.messageProperty());				
 		btnCancel.disableProperty().bind(Bindings.not(task.runningProperty()));				

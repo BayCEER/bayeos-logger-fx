@@ -3,7 +3,6 @@ package bayeos.logger.dump;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -11,11 +10,11 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import bayeos.logger.BulkReader;
-import bayeos.logger.TaskController;
+import bayeos.logger.ProgressTask;
 import de.unibayreuth.bayeos.connection.Connection;
-import javafx.concurrent.Task;
 
-public class UploadDumpTask extends Task<Boolean> {
+@SuppressWarnings("restriction")
+public class UploadDumpTask extends ProgressTask<Boolean> {
 
 	private DumpFile df;
 	private Connection con;
@@ -33,14 +32,12 @@ public class UploadDumpTask extends Task<Boolean> {
 	protected Boolean call() throws Exception {
 		updateTitle("Uploading data to " + con.getURL());
 		log.debug("Start upload task");
-		long startTime = new Date().getTime();
 
 		SimpleHTTPClient client = null;
 		FileInputStream in = null;
 		try {
 			client = new SimpleHTTPClient(con.getURL(), con.getUserName(), con.getPassword());
 			updateProgress(0, df.getLength());
-			updateMessage(TaskController.getUpdateMsg("Upload:", 0, df.getLength(), startTime));
 
 			in = new FileInputStream(df);
 			BulkReader reader = new BulkReader(in);
@@ -59,7 +56,7 @@ public class UploadDumpTask extends Task<Boolean> {
 
 				frames.add(Base64.encodeBase64String(data));
 				if (frames.size() == FRAMES_PER_POST) {
-					updateProgress(bytes, df.length());
+					updateProgress(bytes, df.length());			
 					client.postFrames(frames, df.getOrigin());
 					frames.clear();
 				}
@@ -67,7 +64,7 @@ public class UploadDumpTask extends Task<Boolean> {
 
 			if (!frames.isEmpty()) {
 				client.postFrames(frames, df.getOrigin());
-				updateProgress(bytes, df.length());
+				updateProgress(bytes, df.length());				
 				frames.clear();
 			}
 

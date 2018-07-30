@@ -7,14 +7,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import bayeos.binary.ByteArray;
 import bayeos.file.FrameFile;
 import bayeos.frame.Parser;
 import bayeos.logger.BulkReader;
-import bayeos.logger.TaskController;
-import javafx.concurrent.Task;
+import bayeos.logger.ProgressTask;
 
-public class ExportFileTask extends Task<Boolean> {
+public class ExportFileTask extends ProgressTask<Boolean> {
 
 	private DumpFile sFile;
 	private FrameFile dFile;
@@ -29,13 +27,11 @@ public class ExportFileTask extends Task<Boolean> {
 	protected Boolean call() throws Exception {
 		log.debug("Start export task");
 		updateTitle("Export " + sFile.getAbsolutePath() + " to " + dFile.getPath());
-
-		long startTime = new Date().getTime();
+		
 		int rowNum = 0;
 
 		updateProgress(0, sFile.length());
-		updateMessage(TaskController.getUpdateMsg("Export:", 0, sFile.length(), startTime));
-
+		
 		try {
 			dFile.open();
 			try (FileInputStream in = new FileInputStream(sFile)) {

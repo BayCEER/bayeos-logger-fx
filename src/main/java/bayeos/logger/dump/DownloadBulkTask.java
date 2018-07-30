@@ -5,17 +5,14 @@ import static bayeos.logger.LoggerConstants.BC_SET_READ_TO_LAST_OF_BINARY_END_PO
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 
 import bayeos.logger.BulkWriter;
 import bayeos.logger.MainController;
-import bayeos.logger.TaskController;
-import javafx.concurrent.Task;
+import bayeos.logger.ProgressTask;
 
 
-public class DownloadBulkTask extends Task<DumpFile> {
+public class DownloadBulkTask extends ProgressTask<DumpFile> {
 	bayeos.logger.Logger logger;
 	byte mode;
 	
@@ -35,7 +32,7 @@ public class DownloadBulkTask extends Task<DumpFile> {
 			String name = logger.getName();
 			
 			updateTitle("Download data from " + name);
-			long startTime = new Date().getTime();
+
 			df = new DumpFile(MainController.dumpFileDir.getPath(), name);
 			
 			long bytes = logger.startBulkData(mode);
@@ -49,9 +46,9 @@ public class DownloadBulkTask extends Task<DumpFile> {
 				BulkWriter bulkWriter = new BulkWriter(fout);				
 				long read = 0;
 				while (read < bytes) {
-					updateProgress(read, bytes);
+					
 					if (read % 100 == 0) {
-						updateMessage(TaskController.getUpdateMsg("Bulk download:", read, bytes, startTime));
+						updateProgress(read, bytes);							
 					}
 					if (isCancelled()) {
 						try {

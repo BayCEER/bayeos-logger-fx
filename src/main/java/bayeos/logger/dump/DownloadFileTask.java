@@ -6,12 +6,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
-import org.apache.log4j.Logger;
-import bayeos.logger.BulkWriter;
-import javafx.concurrent.Task;
 
-public class DownloadFileTask extends Task {
+import org.apache.log4j.Logger;
+
+import bayeos.logger.BulkWriter;
+import bayeos.logger.ProgressTask;
+
+public class DownloadFileTask extends ProgressTask<File> {
 	private bayeos.logger.Logger logger;
 	private File file;
 	private static Logger log = Logger.getLogger(DownloadFileTask.class);
@@ -22,9 +23,9 @@ public class DownloadFileTask extends Task {
 	}
 
 	@Override
-	protected Object call() throws Exception {
+	protected File call() throws Exception {
 		updateTitle(String.format("Dump %s to %s", logger.getName(), file.getAbsolutePath()));
-		long startTime = new Date().getTime();
+	
 		BufferedOutputStream bout = null;
 		try {
 			bout = new BufferedOutputStream(new FileOutputStream(file));
@@ -32,7 +33,6 @@ public class DownloadFileTask extends Task {
 
 			long read = 0;
 			long bytes = logger.startBulkData(DM_FULL);
-			long bulks = 0;
 
 			while (read < bytes) {
 				if (isCancelled()) {
@@ -47,25 +47,13 @@ public class DownloadFileTask extends Task {
 				}
 
 				byte[] bulk = logger.readBulk();
-				bulks++;
+
 				bWriter.write(bulk);
 				read = read + bulk.length - 5;
-
-				updateProgress((read > bytes) ? bytes : read, bytes);
-
-				if (bulks % 10 == 0) {
-					int per = Math.round(read / (float) bytes * 100);
-					long millis = Math.round(((new Date().getTime() - startTime) / (float) read) * (bytes - read));
-					int h = (int) ((millis / 1000) / 3600);
-					int m = (int) (((millis / 1000) / 60) % 60);
-					int s = (int) ((millis / 1000) % 60);
-
-					updateMessage(String.format("%d%% read (%02d:%02d:%02d remaining)", per, h, m, s));
-				}
+				updateProgress((read > bytes) ? bytes : read, bytes);	
 			}
 			bout.flush();
 			bout.close();
-
 			logger.stopMode();
 
 		} catch (IOException e) {
