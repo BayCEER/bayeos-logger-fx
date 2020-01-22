@@ -15,10 +15,19 @@ Please refer to the ![user guide](/docs/user-guide.md) for more information.
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.0.9,  2020
+- Enhancement: Render all dates in system time zone
+- Enhancement: Info generation on corrupt files 
+
+### Version 2.0.8, September 19, 2018
+- Fixed bug: GetBattery status  
+
 ### Version 2.0.7, July 30, 2018
 - Fixed bug: [Progress bar](https://github.com/BayCEER/bayeos-logger-fx/issues/5)
+
 ### Version 2.0.6, July 10, 2018
 - Fixed bug: Save incomplete data frames to file 
+
 ### Version 2.0.5, May 15, 2018
 - WebStart support dropped
 - Fixed bug: Delete logger data 

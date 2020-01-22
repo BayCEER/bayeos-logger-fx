@@ -18,6 +18,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
+
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 
@@ -41,6 +42,7 @@ import bayeos.logger.serial.SerialDeviceFX;
 import de.unibayreuth.bayeos.connection.Connection;
 import de.unibayreuth.bayeos.connection.ConnectionFactory;
 import de.unibayreuth.bayeos.connection.ConnectionFileAdapter;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -53,6 +55,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -86,8 +89,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 
 public class MainController {
+	
+	
 
 	private static final Logger log = Logger.getLogger(MainApp.class);
 
@@ -122,33 +129,32 @@ public class MainController {
 	private Button btnReset;
 	@FXML
 	private Button btnSetTime;
-	
+
 	@FXML
 	private GridPane grdLogger;
-	
+
 	@FXML
 	private Label txtLoggerVersion;
 
 	@FXML
 	private TextField txtLoggerName;
-	
+
 	@FXML
 	private TextField txtLoggerInterval;
-	
+
 	@FXML
 	private Label txtLoggerCurrentTime;
 	@FXML
 	private Label txtLoggerNextTime;
 	@FXML
 	private Label txtLoggerNewRecords;
-	
+
 	@FXML
-	private Label txtLoggerBatteryStatus;	
-	
+	private Label txtLoggerBatteryStatus;
+
 	@FXML
 	private Label lblBatteryStatus;
-	
-	
+
 	@FXML
 	private TableView<DumpFile> dumpFileTable;
 
@@ -170,7 +176,6 @@ public class MainController {
 	private Tab tabDumps;
 	@FXML
 	private Tab tabLive;
-		
 
 	@FXML
 	private TabPane tabCharts;
@@ -198,7 +203,6 @@ public class MainController {
 	private DataModeChooser dataModeChooser;
 	private TaskDialog taskDialog;
 
-		
 	private LoggerProperties loggerProperties = new LoggerProperties();
 
 	public void setStage(Stage stage) {
@@ -230,53 +234,53 @@ public class MainController {
 			public void onChanged(Change<? extends FrameData> change) {
 				if (change.next()) {
 					for (FrameData frame : change.getAddedSubList()) {
-						ArrayList<String> sortCha = new ArrayList<String>();	
-						sortCha.addAll(frame.getValues().keySet());						
+						ArrayList<String> sortCha = new ArrayList<String>();
+						sortCha.addAll(frame.getValues().keySet());
 						Collections.sort(sortCha, new Comparator<String>() {
 							@Override
 							public int compare(String o1, String o2) {
 								return extractInt(o1) - extractInt(o2);
-							}			
+							}
+
 							int extractInt(String s) {
-					            String num = s.replaceAll("\\D", "");	         
-					            return num.isEmpty() ? 0 : Integer.parseInt(num);
-					        }			
+								String num = s.replaceAll("\\D", "");
+								return num.isEmpty() ? 0 : Integer.parseInt(num);
+							}
 						});
-						
-						
-						for (String cha: sortCha) {
+
+						for (String cha : sortCha) {
 							String origin = frame.getOrigin();
 							Number value = frame.getValues().get(cha);
-							if (!tabChartIndex.containsKey(origin)) {								
-								// create tab and register it in map								
+							if (!tabChartIndex.containsKey(origin)) {
+								// create tab and register it in map
 								Tab t = new Tab(origin);
-								t.setClosable(false);								
+								t.setClosable(false);
 								t.setGraphic(new ImageView("/images/package_green.png"));
 								ScrollPane sp = new ScrollPane();
 								sp.setFitToWidth(true);
 								VBox v = new VBox();
-								sp.setContent(v);								
-								t.setContent(sp);								
-								int n = tabCharts.getTabs().size();								
-								tabCharts.getTabs().add(n,t);
-								tabChartIndex.put(origin, n);																								
-							}							
-							// Fetch tab 
-							Tab t = tabCharts.getTabs().get(tabChartIndex.get(origin));							
+								sp.setContent(v);
+								t.setContent(sp);
+								int n = tabCharts.getTabs().size();
+								tabCharts.getTabs().add(n, t);
+								tabChartIndex.put(origin, n);
+							}
+							// Fetch tab
+							Tab t = tabCharts.getTabs().get(tabChartIndex.get(origin));
 							String channel = origin + "/" + cha;
-							if (!charts.containsKey(channel)) {								
+							if (!charts.containsKey(channel)) {
 								// Create chart and register it in map
 								ChartPane chartPane = new ChartPane(cha);
 								chartPane.setPrefHeight(100);
-								ScrollPane sp = (ScrollPane)t.getContent();								
-								VBox v = (VBox)sp.getContent();
+								ScrollPane sp = (ScrollPane) t.getContent();
+								VBox v = (VBox) sp.getContent();
 								v.getChildren().add(chartPane);
-								charts.put(channel, chartPane);									
-							}							
+								charts.put(channel, chartPane);
+							}
 							// Fetch chart
 							ChartPane chartPane = charts.get(channel);
-							chartPane.addData(frame.getTs(),value);																
-						}					
+							chartPane.addData(frame.getTs(), value);
+						}
 					}
 				}
 			}
@@ -288,7 +292,7 @@ public class MainController {
 				if (!newValue) {
 					tabCharts.getTabs().clear();
 					tabChartIndex.clear();
-					charts.clear();					
+					charts.clear();
 				}
 
 			}
@@ -302,12 +306,13 @@ public class MainController {
 		tabDumps.disableProperty().bind(liveService.runningProperty());
 
 		lblConnection.textProperty().bind(serialDev.messageProperty());
-		
+
 		grdLogger.visibleProperty().bind(serialDev.connectedProperty());
 
 		btnDownload.disableProperty().bind(serialDev.connectedProperty().not());
 
-		btnDownloadFile.disableProperty().bind(serialDev.connectedProperty().not().or(loggerProperties.versionProperty().lessThan(1.2)));
+		btnDownloadFile.disableProperty()
+				.bind(serialDev.connectedProperty().not().or(loggerProperties.versionProperty().lessThan(1.2)));
 
 		btnReset.disableProperty().bind(serialDev.connectedProperty().not());
 
@@ -331,8 +336,6 @@ public class MainController {
 		btnLiveStop.disableProperty().bind(serialDev.connectedProperty().not());
 		btnLiveStop.visibleProperty().bind(liveService.runningProperty());
 		btnLiveStart.visibleProperty().bind(liveService.runningProperty().not());
-
-			
 
 		coOrigin.setCellValueFactory(new PropertyValueFactory<DumpFile, String>("Origin"));
 		coOrigin.setCellFactory(new Callback<TableColumn<DumpFile, String>, TableCell<DumpFile, String>>() {
@@ -379,22 +382,21 @@ public class MainController {
 		btnExportFile.disableProperty().bind(Bindings.isEmpty(dumpFileTable.getSelectionModel().getSelectedItems()));
 
 		btnInfoFile.disableProperty().bind(Bindings.isEmpty(dumpFileTable.getSelectionModel().getSelectedItems()));
-					
+
 		txtLoggerVersion.textProperty().bind(Bindings.convert(loggerProperties.versionProperty()));
-		
-		txtLoggerName.textProperty().bindBidirectional(loggerProperties.nameProperty());		
-		txtLoggerInterval.textProperty().bindBidirectional(loggerProperties.samplingIntervalProperty());		
+
+		txtLoggerName.textProperty().bindBidirectional(loggerProperties.nameProperty());
+		txtLoggerInterval.textProperty().bindBidirectional(loggerProperties.samplingIntervalProperty());
 		txtLoggerInterval.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				 if (!newValue.matches("\\d*")) {
-			            txtLoggerInterval.setText(newValue.replaceAll("[^\\d]", ""));			            
-			     }					 				 
+				if (!newValue.matches("\\d*")) {
+					txtLoggerInterval.setText(newValue.replaceAll("[^\\d]", ""));
+				}
 			}
 		});
-		
-	
-		txtLoggerInterval.focusedProperty().addListener((o,oldValue,newValue) -> {		
+
+		txtLoggerInterval.focusedProperty().addListener((o, oldValue, newValue) -> {
 			if (oldValue) {
 				try {
 					logger.setSamplingInterval(Integer.valueOf(loggerProperties.getSamplingInterval()));
@@ -403,16 +405,15 @@ public class MainController {
 					Dialogs.showErrorDialog(parentStage, "Failed to set logger interval.");
 				}
 			}
-			}
-		);
-		
+		});
+
 		txtLoggerInterval.setOnKeyPressed(event -> {
-			if(event.getCode() == KeyCode.ENTER){
+			if (event.getCode() == KeyCode.ENTER) {
 				tabPane.requestFocus();
 			}
 		});
-		
-		txtLoggerName.focusedProperty().addListener((o,oldValue,newValue) -> {		
+
+		txtLoggerName.focusedProperty().addListener((o, oldValue, newValue) -> {
 			if (oldValue) {
 				try {
 					logger.setName(loggerProperties.getName());
@@ -421,39 +422,31 @@ public class MainController {
 					Dialogs.showErrorDialog(parentStage, "Failed to set logger name.");
 				}
 			}
-			}
-		);
-		
+		});
+
 		txtLoggerName.setOnKeyPressed(event -> {
-			if(event.getCode() == KeyCode.ENTER){
+			if (event.getCode() == KeyCode.ENTER) {
 				tabPane.requestFocus();
 			}
 		});
-		
-		
-				
-		
-		
-					
+
 		txtLoggerCurrentTime.textProperty().bind(Bindings.convert(loggerProperties.currentTimeProperty()));
 		txtLoggerNextTime.textProperty().bind(Bindings.convert(loggerProperties.nextTimeProperty()));
 		txtLoggerNewRecords.textProperty().bind(Bindings.convert(loggerProperties.newRecordsProperty()));
-		txtLoggerBatteryStatus.textProperty().bind(Bindings.createStringBinding(() ->
-			{
-				if (loggerProperties.getBatteryStatus() == null) {
-					return "Unknown";
-				} else if (logger.getBatteryStatus()) {
-					return "Ok";
-				} else {
-					return "Low";
-				}
-			}	
-		, loggerProperties.batteryStatusProperty()
-		));
-						
-		btnDownloadFile.disableProperty().bind(serialDev.connectedProperty().not().or(loggerProperties.versionProperty().lessThan(1.2F)));				
+		txtLoggerBatteryStatus.textProperty().bind(Bindings.createStringBinding(() -> {
+			if (loggerProperties.getBatteryStatus() == null) {
+				return "Unknown";
+			} else if (logger.getBatteryStatus()) {
+				return "Ok";
+			} else {
+				return "Low";
+			}
+		}, loggerProperties.batteryStatusProperty()));
+
+		btnDownloadFile.disableProperty()
+				.bind(serialDev.connectedProperty().not().or(loggerProperties.versionProperty().lessThan(1.2F)));
 		txtLoggerBatteryStatus.visibleProperty().bind(loggerProperties.versionProperty().greaterThanOrEqualTo(1.4F));
-		
+
 		lblBatteryStatus.visibleProperty().bind(loggerProperties.versionProperty().greaterThanOrEqualTo(1.4F));
 		fileChooser = new FileChooser();
 		dataModeChooser = new DataModeChooser();
@@ -505,7 +498,7 @@ public class MainController {
 	@FXML
 	public void connectSerialAction(ActionEvent event) {
 		log.debug("Connect serial action");
-		
+
 		Set<String> ports = serialDev.getPortNames();
 		if (ports.size() < 1) {
 			Dialogs.showWarningDialog(parentStage, "No serial port found, please check \n your hardware.");
@@ -559,25 +552,23 @@ public class MainController {
 
 	private void queryMetaDataAction(ActionEvent event) {
 		try {
-						
-			loggerProperties.setVersion(Float.valueOf(logger.getVersion()));			
-			String name = logger.getName();			
+
+			loggerProperties.setVersion(Float.valueOf(logger.getVersion()));
+			String name = logger.getName();
 			loggerProperties.setName(name);
 			loggerProperties.setSamplingInterval(String.valueOf(logger.getSamplingInterval()));
-			
-			Date ctime  = logger.getTime();			
+
+			Date ctime = logger.getTime();
 			loggerProperties.setCurrentTime(ctime);
-			
+
 			Date next = logger.getDateOfNextFrame();
-			if (next.before(ctime)) {				
-				loggerProperties.setNextTime(next);				
+			if (next.before(ctime)) {
+				loggerProperties.setNextTime(next);
 			} else {
 				loggerProperties.setNextTime(null);
 			}
-																					
-		
-			
-			// Time shift 			
+
+			// Time shift
 			if (pref.getBoolean("checkTimeShift", true) && loggerProperties.getCurrentTime() != null) {
 				Date now = new Date();
 				if (Math.abs(ctime.getTime() - now.getTime()) > pref.getDouble("timeShiftSecs", 60) * 1000) {
@@ -596,37 +587,36 @@ public class MainController {
 					}
 				}
 			}
-			
-									
+
 			// Calculate new Records
 			ctime = loggerProperties.getCurrentTime();
 			next = loggerProperties.getNextTime();
-			String sampling = loggerProperties.getSamplingInterval(); 
-			if (ctime != null && next != null && sampling != null && ctime.after(next)) {							     				
-				long d = (ctime.getTime() - next.getTime()) / (Integer.valueOf(sampling) * 1000) + 1;								
-				loggerProperties.setNewRecords(d);				
+			String sampling = loggerProperties.getSamplingInterval();
+			if (ctime != null && next != null && sampling != null && ctime.after(next)) {
+				long d = (ctime.getTime() - next.getTime()) / (Integer.valueOf(sampling) * 1000) + 1;
+				loggerProperties.setNewRecords(d);
 			} else {
 				loggerProperties.setNewRecords(null);
 			}
-			
-			loggerProperties.setBatteryStatus(logger.getBatteryStatus());			
-			// Battery Warning 
-			if (pref.getBoolean("checkBattery", true)) {				
+
+			loggerProperties.setBatteryStatus(logger.getBatteryStatus());
+			// Battery Warning
+			if (pref.getBoolean("checkBattery", true)) {
 				if (!loggerProperties.getBatteryStatus()) {
 					Dialogs.showWarningDialog(parentStage, "Logger battery is low.");
 				}
 			}
-			 
-			
+
 		} catch (NumberFormatException | IOException e) {
 			log.error(e);
-			Dialogs.showErrorDialog(parentStage, "Failed to get meta informations from logger.\n" + serialDev.messageProperty().get());
+			Dialogs.showErrorDialog(parentStage,
+					"Failed to get meta informations from logger.\n" + serialDev.messageProperty().get());
 		}
 	}
 
 	@FXML
 	public void disconnectSerialAction(ActionEvent event) {
-		log.debug("Disconnect serial action");								 
+		log.debug("Disconnect serial action");
 		serialDev.disconnect();
 	}
 
@@ -688,8 +678,7 @@ public class MainController {
 			Dialogs.showErrorDialog(parentStage, "Failed to upload data.");
 		}
 	}
-	
-	
+
 	@FXML
 	public void liveStartAction(ActionEvent event) {
 		log.debug("Live start action");
@@ -733,7 +722,7 @@ public class MainController {
 			Date d = new Date();
 			logger.setTime(d);
 			loggerProperties.setCurrentTime(d);
-			
+
 		} catch (IOException e) {
 			log.error(e.getMessage());
 			Dialogs.showErrorDialog(parentStage, "Synchronization of logger time failed.");
@@ -750,18 +739,15 @@ public class MainController {
 		if (res.equals(DialogResponse.YES)) {
 			try {
 				logger.sendBufferCommand(LoggerConstants.BC_ERASE);
-				
+
 				queryMetaDataAction(null);
-				
-				
+
 			} catch (IOException e) {
 				log.error(e.getMessage());
 				Dialogs.showErrorDialog(parentStage, "Reset of logger data failed.");
 			}
 		}
 	}
-
-	
 
 	@FXML
 	public void showAboutDialog(ActionEvent e) {
@@ -783,31 +769,13 @@ public class MainController {
 
 	}
 
-//	@FXML
-//	public void setSamplingIntervalAction(ActionEvent event) {
-//		log.debug("Set sampling interval action");
-//		String input = Dialogs.showInputDialog(parentStage, "Interval [seconds]:", null, "Set sampling interval");
-//		if (input != null) {
-//			try {
-//				logger.setSamplingInterval(Integer.valueOf(input));
-//				txtLoggerSampleInterval.setText(input);
-//			} catch (IOException e) {
-//				log.error(e.getMessage());
-//				Dialogs.showErrorDialog(parentStage, "Set name of logger failed.");
-//			} catch (NumberFormatException e) {
-//				log.error(e.getMessage());
-//				Dialogs.showErrorDialog(parentStage, "Invalid input data.");
-//			}
-//		}
-//	}
-
 	@FXML
 	public void infoFileAction(ActionEvent event) {
 		log.debug("Info File Action started");
-		DumpFile df = dumpFileTable.getSelectionModel().getSelectedItem();
-
 		try {
+			DumpFile df = dumpFileTable.getSelectionModel().getSelectedItem();
 			Map<String, Object> info = df.getInfo();
+			
 			Map<String, SummaryStatistics> stats = (Map<String, SummaryStatistics>) info.get("DataFrameStats");
 			Set<String> keys = stats.keySet();
 			ArrayList<String> keyList = new ArrayList<>(keys);
@@ -815,7 +783,6 @@ public class MainController {
 				private boolean isNr(String s) {
 					return s != null && s.matches("[0-9]+");
 				}
-
 				@Override
 				public int compare(String o1, String o2) {
 					if (isNr(o1) && isNr(o2)) {
@@ -826,54 +793,61 @@ public class MainController {
 				}
 			});
 
-			DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-			StringBuffer f = new StringBuffer("<html>");
-			f.append("<table>");
-			f.append("<tr><td>Min. Date</td><td>").append(dateFormat.format(info.get("MinDate"))).append("</td></tr>");
-			f.append("<tr><td>Max. Date</td><td>").append(dateFormat.format(info.get("MaxDate"))).append("</td></tr>");
-			f.append("<tr><td>Data frames:</td><td>").append(info.get("DataFrameCount").toString())
-					.append("</td></tr>");
-			f.append("<tr><td>Channels:</td><td>").append(String.valueOf(stats.size())).append("</td></tr>");
-
-			f.append("<tr><td>Corrupt frames:</td><td>").append(info.get("CorruptFrameCount").toString())
-					.append("</td></tr>");
-			f.append("<tr><td>Binary frames:</td><td>").append(info.get("BinaryFrameCount").toString())
-					.append("</td></tr>");
-			f.append("<tr><td>Error messages:</td><td>").append(info.get("ErrorMessageCount").toString())
-					.append("</td></tr>");
-			f.append("<tr><td>Messages:</td><td>").append(info.get("MessageCount").toString()).append("</td></tr>");
-
-			f.append("</table>");
-
-			f.append(
-					"<table><thead><tr><th>Channel</th><th>Counts</th><th>Min</th><th>Max</th><th>Mean</th><th>Std.Deviation</th>");
-			f.append("</tr></thead>");
-			f.append("<tbody>");
-
-			for (String key : keyList) {
-				f.append("<tr>");
-				f.append("<td>").append(key).append("</td>");
-				f.append("<td>").append(stats.get(key).getN()).append("</td>");
-				f.append("<td>").append(String.format("%.3f", stats.get(key).getMin())).append("</td>");
-				f.append("<td>").append(String.format("%.3f", stats.get(key).getMax())).append("</td>");
-				f.append("<td>").append(String.format("%.3f", stats.get(key).getMean())).append("</td>");
-				f.append("<td>").append(String.format("%.3f", stats.get(key).getStandardDeviation())).append("</td>");
-				f.append("</tr>");
-
-			}
-
-			f.append("</tbody>");
-			f.append("</table>");
-			f.append("</html>");
-
+			DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);						
 			Alert a = new Alert(AlertType.INFORMATION);
 			a.setTitle("Properties of " + df.getAbsolutePath());
 			a.setHeaderText("");
-			WebView webView = new WebView();
-			webView.getEngine().loadContent(f.toString());
+			a.setResizable(true);
+			
+			
+			TreeItem<String> rootItem = new TreeItem<String>("Stats");
+			rootItem.setExpanded(true);			
+			rootItem.getChildren().addAll(
+					new TreeItem<String>(String.format("Data Frames: %s",info.get("DataFrameCount"))),										
+					new TreeItem<String>(String.format("Corrupt Frames: %s",info.get("CorruptFrameCount"))),
+					new TreeItem<String>(String.format("Binary Frames: %s",info.get("BinaryFrameCount"))),
+					new TreeItem<String>(String.format("Error Messages: %s",info.get("ErrorMessageCount"))),
+					new TreeItem<String>(String.format("Messages: %s",info.get("MessageCount")))										
+			);
+			
+			if ((long)info.get("DataFrameCount")>0) {
+				rootItem.getChildren().addAll(
+				new TreeItem<String>(String.format("Start: %s",info.get("MinDate"))), 
+				new TreeItem<String>(String.format("End: %s",info.get("MaxDate")))
+				);				
+			}
+			
+			TreeItem chaRoot = new TreeItem<String>("Channels");
+			for (String key : keyList) {
+				TreeItem cha = new TreeItem<String>(key);			
+				cha.getChildren().addAll(
+						new TreeItem<String>(String.format("Count: %s",stats.get(key).getN())),
+						new TreeItem<String>(String.format("Min: %.3f",stats.get(key).getMin())),
+						new TreeItem<String>(String.format("Max: %.3f",stats.get(key).getMax())),
+						new TreeItem<String>(String.format("Mean: %.3f",stats.get(key).getMean())),
+						new TreeItem<String>(String.format("Standard deviation: %.3f",stats.get(key).getStandardDeviation()))						
+						);
+				chaRoot.getChildren().add(cha);
+			}
+			
+			if (chaRoot.getChildren().size() > 0) {
+				rootItem.getChildren().add(chaRoot);	
+			}
+					
+			TreeView<String> treeView = new TreeView<String>(rootItem);			
+			treeView.setShowRoot(false);
+			treeView.setPrefWidth(400);
 
-			a.getDialogPane().setContent(webView);
-			;
+			ScrollPane scrollPane = new ScrollPane();
+			scrollPane.setFitToWidth(true);
+			scrollPane.setFitToHeight(true);
+			scrollPane.setContent(treeView);
+
+			BorderPane borderPane = new BorderPane();
+			borderPane.setPadding(new Insets(10, 10, 10, 10));
+			borderPane.setCenter(scrollPane);
+			
+			a.getDialogPane().setContent(borderPane);
 			a.show();
 
 		} catch (IOException e) {

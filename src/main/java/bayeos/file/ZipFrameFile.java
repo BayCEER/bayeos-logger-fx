@@ -30,8 +30,7 @@ public class ZipFrameFile extends AbstractFrameFile  {
 	
 	private static final SimpleDateFormat df;
 	static {
-		df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("GMT+1"));
+		df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss Z");		
 	}
 		
 	public ZipFrameFile(String path) {

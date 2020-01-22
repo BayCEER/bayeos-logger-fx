@@ -27,10 +27,7 @@ public class MainApp extends Application {
     @Override
 	public void start(Stage stage) throws Exception {
         log.info("Starting Logger FX Application");
-        
-        System.setProperty("user.timezone", "GMT+1");
-		TimeZone.setDefault(TimeZone.getTimeZone("GMT+1"));
-		
+               		
         loadMainPane(stage);
     }
 

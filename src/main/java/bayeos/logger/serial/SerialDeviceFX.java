@@ -130,10 +130,7 @@ public class SerialDeviceFX implements ISerialDevice {
 		
 	}
 
-	@Override
-	public int available() throws IOException {
-		return available;
-	}
+	
 	
 	
  	

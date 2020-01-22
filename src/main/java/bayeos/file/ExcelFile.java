@@ -31,8 +31,7 @@ public class ExcelFile extends AbstractFrameFile {
 	private Map<String, Integer> lastRows;
 	private Integer lastRow;
 
-	private Calendar d = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+1"));
-
+	
 	public ExcelFile(String path) {
 		super(path);
 	}
@@ -73,8 +72,8 @@ public class ExcelFile extends AbstractFrameFile {
 
 		Row row = sh.createRow(lastRow++);
 		Cell cell = row.createCell(0);
-		d.setTimeInMillis(new Date(((long) (frame.get("ts")) / (1000 * 1000))).getTime());
-		cell.setCellValue(d.getTime());
+		long millis = (long) (frame.get("ts")) / (1000 * 1000);						
+		cell.setCellValue(new Date(millis));
 		cell.setCellStyle(csTime);
 		Map<String, Number> values = (Map<String, Number>) frame.get("value");
 		addColumnIndex(origin, values);

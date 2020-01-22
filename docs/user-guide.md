@@ -1,31 +1,34 @@
 # BayEOS Logger FX User Guide
-Released 2018-05-16
+Released 2020-01-22
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-* [About](#about)
-* [Installation](#installation)
-	* [Prerequisites](#prerequisites)
-	* [Windows](#windows)
-	* [Linux](#linux)
-	* [Mac](#mac)
-* [First Time Configuration](#first-time-configuration)
-* [Main Tasks](#main-tasks)
-	* [Data Download](#data-download)
-	* [Data Upload](#data-upload)
-	* [Live Mode](#live-mode)
-* [Logger Configuration](#logger-configuration)
-* [Troubleshooting](#troubleshooting)
-	* [No serial device found](#no-serial-device-found)
-	* [Using an internal SD card file](#using-an-internal-sd-card-file)
+- [BayEOS Logger FX User Guide](#bayeos-logger-fx-user-guide)
+  - [About](#about)
+  - [Installation](#installation)
+    - [Prerequisites](#prerequisites)
+    - [Windows](#windows)
+    - [Linux](#linux)
+    - [Mac](#mac)
+  - [First Time Configuration](#first-time-configuration)
+  - [Main Tasks](#main-tasks)
+    - [Data Download](#data-download)
+    - [Data Upload](#data-upload)
+    - [Dump File Inspection](#dump-file-inspection)
+    - [Dump File Export](#dump-file-export)
+    - [Live Mode](#live-mode)
+  - [Logger Configuration](#logger-configuration)
+  - [Troubleshooting](#troubleshooting)
+    - [No serial device found](#no-serial-device-found)
+    - [Using an internal SD card file](#using-an-internal-sd-card-file)
 
 <!-- /code_chunk_output -->
 
 
 ## About 
-BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS Gateway](http://https://github.com/BayCEER/bayeos-gateway). It plays the role of a staging area between your field site and the gateway. You can use it to download data from a logger, store it temporary and send it to a remote BayEOS gateway afterwards. A live mode enables you to verify the health status of all connected sensors.
+BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS Gateway](https://github.com/BayCEER/bayeos-gateway). It plays the role of a staging area between your field site and the gateway. You can use it to download data from a logger, store it temporary and send it to a remote BayEOS gateway afterwards. A live mode enables you to verify the health status of all connected sensors.
 
 ## Installation
 
@@ -36,7 +39,7 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 
 ### Windows
 1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/bayeos/bayeos-logger-fx.zip)
-1. Download and install the latest [JRE (version >=8)](http://www.java.com/)
+1. Download and install the latest [JRE 8](https://corretto.aws/downloads/latest/amazon-corretto-8-x64-windows-jre.zip)
 1. Connect your PC with a logger using a USB cable
 1. Wait until the device driver is installed
 1. Open the device manager (right click on start/device manager) and search for a new USB Serial Port. Mark the port number.  
@@ -46,7 +49,7 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 
 ### Linux
 1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/bayeos/bayeos-logger-fx.zip)
-1. Login with root privileges and download the latest [JRE (version >=8)](http://www.java.com/) software
+1. Login with root privileges and download the latest [JRE 8](https://corretto.aws/downloads/latest/amazon-corretto-8-x64-linux-jdk.tar.gz) software
 1. Extract the tar file to the default JRE location e.g. /usr/lib/jvm/jre8
 1. Install the new JRE alternative: 
 ``update-alternatives --install /usr/bin/java java /usr/lib/jvm/jre8/bin/java 1``
@@ -57,12 +60,13 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 Replace ``<username>`` with your personal system user name
 1. Connect your PC with a logger to install the required USB Serial device driver. Your OS should inform you that a new serial device called FT232R USB UART was found
 1. Figure out the logger device by a grep for "ttyUSB" on dmesg
-1. Mark the device 
+1. Make the jar file executable:
+``chmod +x bayeos-logger-fx<version>.jar``
 1. Start ``bayeos-logger-fx<version>.jar`` with a mouse click 
 
 ### Mac
 1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/bayeos/bayeos-logger-fx.zip)
-1. Login with root privileges and download the latest [JRE (version >=8)](http://www.java.com/) software
+1. Login with root privileges and download the latest [JRE 8](https://corretto.aws/downloads/latest/amazon-corretto-8-x64-macos-jdk.pkg) software
 1. Start ``bayeos-logger-fx<version>.jar`` with a mouse click 
 
 ## First Time Configuration
@@ -85,19 +89,32 @@ Replace ``<username>`` with your personal system user name
 1. Press the download button ![Download](UploadButton.png) 
 1. Choose `New` to download all new records since your last download:  
 ![Download new data](DownloadNew.png)
-1. Press the `OK` to start the data download task
+1. Press `OK` to start the data download task
 1. The data is downloaded and a new dump record can be found on the dumps tab:  
 ![Dump view](DumpView.png)
 1. Press `Disconnect` and disconnect the logger cable or close the Bluetooth connection
 1. You are now ready to upload the data to a BayEOS Gateway
 
 ### Data Upload
-1. Be sure that your PC is connected to the internet and the 
-BayEOS gateway can be accessed
+1. Be sure that your PC is connected to the internet and the BayEOS gateway can be accessed
 1. Start the BayEOS Logger FX application  
 1. Select the dump record to upload on the `Dumps` tab
 1. Press the upload button ![Upload Button](UploadButton.png) to send the data to the gateway
-1. The dump record is deleted after a successful upload 
+1. The dump record is deleted after a successful upload
+
+### Dump File Inspection
+Please select a file on the `Dumps` tab and press the ![info button](InfoButton.png) button to inspect its main statistics:   
+![FileInfo](FileInfo.png)
+
+### Dump File Export 
+1. Select one or more files on tab `Dumps`
+1. Press the export button
+1. Choose the export destination and the right format:
+	+  __Open XML File Format (XLSX Extension)__
+	Time information is converted using your plattform specific time setting!
+	+  __Zipped/CSV Format (Zip Extension)__
+	Time information is converted using the following format string: `dd.MM.yyyy HH:mm:ss Z`
+1. Press `Ok` to start the export 
 
 ### Live Mode 
 The live mode allows you to verify the sensor data in situ. It can be activated on an already connected logger by clicking the `Start` button on the live tab. The data is shown as it is received from the BayEOS board. Data logging is not stopped during live mode. Please press the `Stop` button to turn the live mode off.  
