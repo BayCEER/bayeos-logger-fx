@@ -57,7 +57,7 @@
 										</Label>
 										<TextField fx:id="txtLoggerName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 										<TextField fx:id="txtLoggerInterval" GridPane.columnIndex="1" GridPane.rowIndex="2" />										
-										<Label fx:id="lblLoggerInterval" text="Sampling Interval [sec]*" GridPane.rowIndex="2">
+										<Label fx:id="lblLoggerInterval" text="Logging Interval [sec]*" GridPane.rowIndex="2">
 											<font>
 												<Font name="System Bold" size="12.0" />
 											</font>

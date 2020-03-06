@@ -399,7 +399,7 @@ public class MainController {
 		txtLoggerInterval.focusedProperty().addListener((o, oldValue, newValue) -> {
 			if (oldValue) {
 				try {
-					logger.setSamplingInterval(Integer.valueOf(loggerProperties.getSamplingInterval()));
+					logger.setLoggingInterval(Integer.valueOf(loggerProperties.getSamplingInterval()));
 				} catch (NumberFormatException | IOException e) {
 					log.error(e);
 					Dialogs.showErrorDialog(parentStage, "Failed to set logger interval.");
@@ -431,12 +431,33 @@ public class MainController {
 		});
 
 		txtLoggerCurrentTime.textProperty().bind(Bindings.convert(loggerProperties.currentTimeProperty()));
-		txtLoggerNextTime.textProperty().bind(Bindings.convert(loggerProperties.nextTimeProperty()));
-		txtLoggerNewRecords.textProperty().bind(Bindings.convert(loggerProperties.newRecordsProperty()));
+		
+		// txtLoggerNextTime.textProperty().bind(Bindings.convert(loggerProperties.nextTimeProperty()));
+		
+		txtLoggerNextTime.textProperty().bind(Bindings.createStringBinding(() -> {			
+			if (loggerProperties.getNextTime() == null) {
+				return "Unknown";
+			} else {
+				return loggerProperties.getNextTime().toString();
+			}
+		}, loggerProperties.nextTimeProperty()));
+		
+		
+		// txtLoggerNewRecords.textProperty().bind(Bindings.convert(loggerProperties.newRecordsProperty()));
+		
+		txtLoggerNewRecords.textProperty().bind(Bindings.createStringBinding(() -> {			
+			if (loggerProperties.getNewRecords() == null) {
+				return "Unknown";
+			} else {
+				return loggerProperties.getNewRecords().toString();
+			}
+		}, loggerProperties.newRecordsProperty()));
+		
+		
 		txtLoggerBatteryStatus.textProperty().bind(Bindings.createStringBinding(() -> {
 			if (loggerProperties.getBatteryStatus() == null) {
 				return "Unknown";
-			} else if (logger.getBatteryStatus()) {
+			} else if (loggerProperties.getBatteryStatus()) {
 				return "Ok";
 			} else {
 				return "Low";
@@ -556,7 +577,7 @@ public class MainController {
 			loggerProperties.setVersion(Float.valueOf(logger.getVersion()));
 			String name = logger.getName();
 			loggerProperties.setName(name);
-			loggerProperties.setSamplingInterval(String.valueOf(logger.getSamplingInterval()));
+			loggerProperties.setSamplingInterval(String.valueOf(logger.getLoggingInterval()));
 
 			Date ctime = logger.getTime();
 			loggerProperties.setCurrentTime(ctime);
@@ -599,16 +620,18 @@ public class MainController {
 				loggerProperties.setNewRecords(null);
 			}
 
-			loggerProperties.setBatteryStatus(logger.getBatteryStatus());
-			// Battery Warning
-			if (pref.getBoolean("checkBattery", true)) {
-				if (!loggerProperties.getBatteryStatus()) {
-					Dialogs.showWarningDialog(parentStage, "Logger battery is low.");
+			if (loggerProperties.getVersion().floatValue() > 1.2F) {				
+				Boolean bat = logger.getBatteryStatus();
+				loggerProperties.setBatteryStatus(bat);				
+				if ((bat != null) && (pref.getBoolean("checkBattery", true) && !bat)) {
+						Dialogs.showWarningDialog(parentStage, "Logger battery is low.");
+
 				}
 			}
-
+			
 		} catch (NumberFormatException | IOException e) {
 			log.error(e);
+			serialDev.disconnect();
 			Dialogs.showErrorDialog(parentStage,
 					"Failed to get meta informations from logger.\n" + serialDev.messageProperty().get());
 		}
@@ -626,7 +649,7 @@ public class MainController {
 
 		DumpFile df = dumpFileTable.getSelectionModel().getSelectedItem();
 		DialogResponse res = Dialogs.showConfirmDialog(parentStage,
-				String.format("Really delete all records of %s?", "" + df.getOrigin()), null, null,
+				String.format("Really delete this %s dump file?", "" + df.getOrigin()), null, null,
 				DialogOptions.YES_NO);
 		if (res.equals(DialogResponse.YES)) {
 			log.debug(String.format("Remove %s", df.getAbsolutePath()));

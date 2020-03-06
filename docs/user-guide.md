@@ -1,5 +1,5 @@
 # BayEOS Logger FX User Guide
-Released 2020-01-22
+Released 2020-03-06
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -38,9 +38,8 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 - PC system clock is synchronized with a NTP time server
 
 ### Windows
-1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/bayeos/bayeos-logger-fx.zip)
-1. Download and install the latest [JRE 8](https://corretto.aws/downloads/latest/amazon-corretto-8-x64-windows-jre.zip)
-1. Connect your PC with a logger using a USB cable
+1. Download and unpack the [logger software](http://www.bayceer.uni-bayreuth.de/edv/bayeos/bayeos-logger-fx-windows.zip)
+1. Connect your PC with a logger or wireless adapter using an USB cable
 1. Wait until the device driver is installed
 1. Open the device manager (right click on start/device manager) and search for a new USB Serial Port. Mark the port number.  
 ![DeviceManager](DeviceManager.png)
@@ -58,7 +57,7 @@ BayEOS Logger FX is a utility to transfer data from BayEOS Loggers to a [BayEOS 
 1. Add yourself to the dialout group:
 ``sudo usermod -aG dialout <username>``
 Replace ``<username>`` with your personal system user name
-1. Connect your PC with a logger to install the required USB Serial device driver. Your OS should inform you that a new serial device called FT232R USB UART was found
+1. Connect your PC with a logger or wireless logger adapater to install the required USB Serial device driver. Your OS should inform you that a new serial device called FT232R USB UART was found
 1. Figure out the logger device by a grep for "ttyUSB" on dmesg
 1. Make the jar file executable:
 ``chmod +x bayeos-logger-fx<version>.jar``
@@ -82,7 +81,7 @@ Replace ``<username>`` with your personal system user name
 1. Connect your PC with the logger 
 1. Start the BayEOS Logger FX application by clicking the desktop icon
 1. Press the `Connect` button
-1. Choose the serial port and baudrate (38400) and press `connect`:  
+1. Choose the serial port and press `connect`:  
 ![Connect dialog](ConnectDialog.png))
 1. The main window shows the logger meta information  
 ![MainFrameConnected](MainFrameConnected.png)
@@ -123,7 +122,7 @@ The live mode allows you to verify the sensor data in situ. It can be activated 
 ## Logger Configuration
 You can configure your logger on the main logger tab to set the logger:
 **Name**: A string to identify your logger on a destination gateway (mandatory)
-**Sampling interval**: interval to save sensor values in secs (mandatory).
+**Logging interval**: interval to save logger values in secs (mandatory).
 **Current time**: current logger time (mandatory), can be synced with your local PC time
 
 ## Troubleshooting

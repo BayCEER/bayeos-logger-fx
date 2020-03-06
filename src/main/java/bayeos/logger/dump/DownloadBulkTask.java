@@ -5,6 +5,8 @@ import static bayeos.logger.LoggerConstants.BC_SET_READ_TO_LAST_OF_BINARY_END_PO
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+
 import org.apache.log4j.Logger;
 
 import bayeos.logger.BulkWriter;
@@ -41,12 +43,11 @@ public class DownloadBulkTask extends ProgressTask<DumpFile> {
 			}
 
 			updateProgress(0, bytes);
-			log.info("Downloading data to " + df.getAbsolutePath());
-			try (BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(df))) {
+			log.info("Downloading data to " + df.getAbsolutePath());			
+			try (RandomAccessFile fout = new RandomAccessFile(df, "rw")) {
 				BulkWriter bulkWriter = new BulkWriter(fout);				
 				long read = 0;
-				while (read < bytes) {
-					
+				while (read < bytes) {					
 					if (read % 100 == 0) {
 						updateProgress(read, bytes);							
 					}
@@ -63,8 +64,7 @@ public class DownloadBulkTask extends ProgressTask<DumpFile> {
 					byte[] bulk = logger.readBulk();					
 					read += bulk.length - 5;
 					bulkWriter.write(bulk);
-				}
-				fout.flush();				
+				}							
 			}
 			
 			log.debug("Send buffer command.");

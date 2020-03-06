@@ -10,3 +10,4 @@ release.properties
 .settings/
 lib/
 deploy/BayEOS-Logger.exe
+deploy/jre8/

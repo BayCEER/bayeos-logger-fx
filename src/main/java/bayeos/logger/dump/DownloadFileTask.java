@@ -2,10 +2,9 @@ package bayeos.logger.dump;
 
 import static bayeos.logger.LoggerConstants.DM_FULL;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import org.apache.log4j.Logger;
 
@@ -25,15 +24,12 @@ public class DownloadFileTask extends ProgressTask<File> {
 	@Override
 	protected File call() throws Exception {
 		updateTitle(String.format("Dump %s to %s", logger.getName(), file.getAbsolutePath()));
-	
-		BufferedOutputStream bout = null;
-		try {
-			bout = new BufferedOutputStream(new FileOutputStream(file));
-			BulkWriter bWriter = new BulkWriter(bout);
+			
+		try (RandomAccessFile ra = new RandomAccessFile(file, "rw")){			
+			BulkWriter bWriter = new BulkWriter(ra);
 
 			long read = 0;
 			long bytes = logger.startBulkData(DM_FULL);
-
 			while (read < bytes) {
 				if (isCancelled()) {
 					try {
@@ -51,19 +47,13 @@ public class DownloadFileTask extends ProgressTask<File> {
 				bWriter.write(bulk);
 				read = read + bulk.length - 5;
 				updateProgress((read > bytes) ? bytes : read, bytes);	
-			}
-			bout.flush();
-			bout.close();
+			}			
 			logger.stopMode();
-
 		} catch (IOException e) {
 			log.error(e.getMessage());
 			logger.breakSocket();
 			logger.stopMode();
 
-		} finally {
-			if (bout != null)
-				bout.close();
 		}
 		return null;
 	}

@@ -1,0 +1,1 @@
+launch4jc.exe bayeos-logger_bundled.xml

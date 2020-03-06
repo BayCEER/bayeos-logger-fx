@@ -21,7 +21,7 @@ public class SerialDeviceFX implements ISerialDevice {
 	
 	private static final Logger log = Logger.getLogger(SerialDeviceFX.class);
 
-	private int timeout = 10000;
+	private int timeout = 2000;
 		
 	private SerialPort port;
 	

@@ -15,9 +15,16 @@ Please refer to the ![user guide](/docs/user-guide.md) for more information.
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.0.10,  2020
+- Reduced serial connection timeout from 10 to 2 seconds
+- Enhancement: Out of order support in bulk writer
+- Sampling interval renamed to logging interval
+- Bundled JRE for Windows  
+ 
 ### Version 2.0.9,  2020
 - Enhancement: Render all dates in system time zone
 - Enhancement: Info generation on corrupt files 
+
 
 ### Version 2.0.8, September 19, 2018
 - Fixed bug: GetBattery status  
