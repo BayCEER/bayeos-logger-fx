@@ -121,9 +121,9 @@ The live mode allows you to verify the sensor data in situ. It can be activated 
 
 ## Logger Configuration
 You can configure your logger on the main logger tab to set the logger:
-**Name**: A string to identify your logger on a destination gateway (mandatory)
-**Logging interval**: interval to save logger values in secs (mandatory).
-**Current time**: current logger time (mandatory), can be synced with your local PC time
+  **Name**: A string to identify your logger on a destination gateway (mandatory)
+  **Logging interval**: interval to save logger values in secs (mandatory).
+  **Current time**: current logger time (mandatory), can be synced with your local PC time
 
 ## Troubleshooting
 
