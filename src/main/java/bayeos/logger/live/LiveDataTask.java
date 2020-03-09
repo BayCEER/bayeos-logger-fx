@@ -46,7 +46,9 @@ public class LiveDataTask extends Task<Void> {
 			String loggerName = logger.getName();
 			logger.startLiveData();
 			while (active) {
+				try {
 				byte[] data = logger.readData();
+				
 				if (data != null) {
 					Map<String, Object> frame = Parser.parse(data, new Date(), loggerName, null);
 					Platform.runLater(new Runnable() {
@@ -65,9 +67,13 @@ public class LiveDataTask extends Task<Void> {
 								break;
 							}
 						}
-					});
+					});				
 				} else {
 					Thread.sleep(500);
+				}
+				
+				} catch (IOException e) {
+					log.debug(e.getMessage());
 				}
 			}
 		} catch (IOException| FrameParserException| InterruptedException e) {

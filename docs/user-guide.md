@@ -95,9 +95,10 @@ Replace ``<username>`` with your personal system user name
 1. You are now ready to upload the data to a BayEOS Gateway
 
 ### Data Upload
-1. Be sure that your PC is connected to the internet and the BayEOS gateway can be accessed
+1. Be sure that your PC is connected to the internet
 1. Start the BayEOS Logger FX application  
 1. Select the dump record to upload on the `Dumps` tab
+1. Choose a [connection configuration](#first-time-configuration)
 1. Press the upload button ![Upload Button](UploadButton.png) to send the data to the gateway
 1. The dump record is deleted after a successful upload
 
@@ -121,9 +122,9 @@ The live mode allows you to verify the sensor data in situ. It can be activated 
 
 ## Logger Configuration
 You can configure your logger on the main logger tab to set the logger:
-  **Name**: A string to identify your logger on a destination gateway (mandatory)
-  **Logging interval**: interval to save logger values in secs (mandatory).
-  **Current time**: current logger time (mandatory), can be synced with your local PC time
+- **Name**: A string to identify your logger on a destination gateway (mandatory)
+- **Logging interval**: interval to save logger values in secs (mandatory).
+- **Current time**: current logger time (mandatory), can be synced with your local PC time
 
 ## Troubleshooting
 
