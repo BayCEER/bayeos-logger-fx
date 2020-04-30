@@ -15,6 +15,9 @@ Please refer to the ![user guide](/docs/user-guide.md) for more information.
 * **Oliver Archner** - *Programmer* - [BayCEER, University of Bayreuth](https://www.bayceer.uni-bayreuth.de)
 
 ## History
+### Version 2.0.11, 2020
+- Fixed critical bug: Errors on upload not detected
+
 ### Version 2.0.10,  2020
 - Reduced serial connection timeout from 10 to 2 seconds
 - Enhancement: Out of order support in bulk writer

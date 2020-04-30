@@ -2,7 +2,7 @@
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>bayeos-logger-fx-2.0.10-jfx.jar</jar>
+  <jar>bayeos-logger-fx-2.0.11-jfx.jar</jar>
   <outfile>BayEOS-Logger.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>

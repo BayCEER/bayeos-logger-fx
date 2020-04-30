@@ -680,7 +680,7 @@ public class MainController {
 
 				try {
 					if (task.get()) {
-						if (pref.getBoolean("checkDeleteDump", true)) {
+						if (pref.getBoolean("checkDeleteDump", false)) {
 							dumpFile.delete();
 							dumpFileList.remove(dumpFile);
 						}

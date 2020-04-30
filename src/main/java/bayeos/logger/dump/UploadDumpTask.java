@@ -56,14 +56,20 @@ public class UploadDumpTask extends ProgressTask<Boolean> {
 
 				frames.add(Base64.encodeBase64String(data));
 				if (frames.size() == FRAMES_PER_POST) {
-					updateProgress(bytes, df.length());			
-					client.postFrames(frames, df.getOrigin());
+					ReturnCode r = client.postFrames(frames, df.getOrigin());
+					if (r != ReturnCode.OK){
+						throw new IOException(r.getMsg());
+					};
+					updateProgress(bytes, df.length());
 					frames.clear();
 				}
 			}
 
 			if (!frames.isEmpty()) {
-				client.postFrames(frames, df.getOrigin());
+				ReturnCode r = client.postFrames(frames, df.getOrigin());
+				if (r != ReturnCode.OK){
+					throw new IOException(r.getMsg());
+				};
 				updateProgress(bytes, df.length());				
 				frames.clear();
 			}

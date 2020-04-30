@@ -36,6 +36,16 @@ class ReturnCode {
 	public static final ReturnCode NOT_IMPLEMENTED  = new ReturnCode(405, "Method not implemented.");
 	public static final ReturnCode OK  = new ReturnCode(200, "ok");
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof ReturnCode) {
+			return this.responseCode == ((ReturnCode)obj).responseCode;
+		} else {
+			return false;
+		}
+		
+	}
+	
 	
 		
 }
