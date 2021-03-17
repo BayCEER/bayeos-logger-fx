@@ -594,7 +594,7 @@ public class MainController {
 				Date now = new Date();
 				if (Math.abs(ctime.getTime() - now.getTime()) > pref.getDouble("timeShiftSecs", 60) * 1000) {
 					DialogResponse r = Dialogs.showConfirmDialog(parentStage,
-							"Timeshift of logger detected.\nWould you like to synchronize the logger clock with your system clock?",
+							"Time shift of logger detected.\nWould you like to synchronize the logger clock with your system clock?",
 							null, "Please confirm", DialogOptions.YES_NO);
 					if (r == DialogResponse.YES) {
 						try {
@@ -633,7 +633,7 @@ public class MainController {
 			log.error(e);
 			serialDev.disconnect();
 			Dialogs.showErrorDialog(parentStage,
-					"Failed to get meta informations from logger.\n" + serialDev.messageProperty().get());
+					"Failed to get meta information from logger.\n" + serialDev.messageProperty().get());
 		}
 	}
 
